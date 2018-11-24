@@ -45,10 +45,16 @@ Cell::Cell(const std::string& strCell)
 
     //std::cout << "Cell::Cell(const std::string& strCell) start" << std::endl;
     //std::cout << "mStrCell = " << mStrCell << std::endl;
-    //std::cout << "getExponentPrefix = " << getExponentPrefix() << std::endl;
+    std::cout << "getExponentPrefix = " << getExponentPrefix() << std::endl;
     //std::cout << "getExponent = " << getExponent() << std::endl;
     //std::cout << "getSubscript = " << getSubscript() << std::endl;
     //std::cout << "Cell::Cell(const std::string& strCell) end" << std::endl;
+
+    /* 底数是1的话，无论指数是多少结果都为1 */
+    if (getExponentPrefix() == "1") {
+        mStrCell = "1";
+        return ;
+    }
 }
 
 
@@ -343,24 +349,42 @@ bool Cell::isNumberMixPISubscriptWithExponent(std::string str)
 /* a^(12) or a^(1/2) */
 std::string Cell::getExponent()
 {
-    std::string strRet;
-    int iPosStart = 0;
-    int iPosEnd = 0;
+    std::string subStr;
+    int iPosLeft = 0;
+    int iPosRight = 0;
+    int iFlag = 0;
 
     int iPos = mStrCell.find('^', 0);
     if (iPos < 0)
         return "\0";
 
-    iPosStart = mStrCell.find('(', iPos);
-    if (iPosStart < 0)
-        return "\0";
 
-    iPosEnd = mStrCell.find(')', iPos);
-    if (iPosEnd < 0)
-        return "\0";
+    iPosLeft = mStrCell.find('(', 0);
+    if (iPosLeft < 0 || iPosLeft > iPos) {
+        subStr = mStrCell.substr(iPos + 2);
+        subStr.pop_back();
+        return subStr;
+    }
+    else {
+        for (size_t i = 0; i < mStrCell.size(); i++) {
+            iPosRight = i;
+            if (mStrCell.at(i) == '(') {
+                iFlag++;
+            }
 
-    iPosStart += 1;
-    return mStrCell.substr(iPosStart, iPosEnd - iPosStart);
+            if (mStrCell.at(i) == ')')
+                iFlag--;
+
+            if (mStrCell.at(i) == '^') {
+                if (iFlag == 0)
+                    break;
+            }
+
+        }
+        subStr = mStrCell.substr(iPosRight - iPosLeft + 2);
+        subStr.pop_back();
+        return subStr;
+    }
 }
 
 /* a[123] exp[123] pi[123]^(123) */
@@ -384,6 +408,7 @@ std::string Cell::getSubscript()
 /* pi[123]^(123)or ((a^2 + b)*(a + c))^(a+b^3) */
 std::string Cell::getExponentPrefix()
 {
+    std::string subStr;
     int iPosLeft = 0;
     int iPosRight = 0;
     int iFlag = 0;
@@ -413,7 +438,9 @@ std::string Cell::getExponentPrefix()
             }
 
         }
-        return mStrCell.substr(iPosLeft, iPosRight - iPosLeft);
+        subStr = mStrCell.substr(iPosLeft+1, iPosRight - iPosLeft);
+        subStr.pop_back();
+        return subStr;
     }
 
 }
