@@ -56,8 +56,14 @@ public:
 
     std::string getExponent();
     std::string getSubscript();
+    std::string getExponentPrefix();
 
     void addParentheses();
+
+
+    bool operator==(Cell& cell);
+
+    void deleteAllMark(std::string &s, const std::string &mark);
 };
 
 #endif // CELL_H

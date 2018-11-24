@@ -7,7 +7,8 @@ Item::Item(const std::string& strItem)
     :mStrItem(strItem)
 {
 
-
+    if (mStrItem.empty())
+        return;
 
     if(isSimpleNumber(mStrItem))
         mType = SIMPLENUMBER;
@@ -205,10 +206,69 @@ void Item::exponentUnfold(void)
     parseItemToCell(mStrItem);
 }
 
-/* a*a*b*b ---> a^(2)*b^(2) */
+/* +a*a*b*b ---> +a^(2)*b^(2) */
+/* +f*exp[0]*a*b*exp[0]^6*exp[0]*exp[0]*pi[0]*pi[0]*pi[0]*pi[0]*a*a*a */
 void Item::exponentFold(void)
 {
+    std::list<Cell*> targetCellList;
+    std::list<Cell*> remainCellList;
+    Cell *curCell = NULL;
+    Cell *targetCell = NULL;
+    std::string tmpStr;
+    std::string countStr;
+    std::stringstream stream;
 
+    tmpStr = mStrItem.at(0);
+
+
+
+    while (mCellList.size()) {
+        while (mCellList.size()) {
+            curCell = mCellList.front();
+            mCellList.pop_front();
+
+            if (targetCellList.empty()) {
+                targetCell = curCell;
+                targetCellList.push_back(curCell);
+                continue;
+            }
+
+            if (*curCell == *targetCell) {
+                targetCellList.push_back(curCell);
+                continue;
+            }
+            else {
+                remainCellList.push_back(curCell);
+                continue;
+            }
+        }
+
+        /* 从目标链表中构造 a^3 */
+        stream << targetCellList.size();
+        stream >> countStr;
+        if (targetCellList.size() == 1)
+            tmpStr += targetCell->mStrCell + "*";
+        else
+            tmpStr += targetCell->mStrCell + "^" + countStr +"*";
+
+        while (targetCellList.size()) {
+            Cell *tmpCell = targetCellList.front();
+            targetCellList.pop_front();
+            delete tmpCell;
+        }
+
+        while (remainCellList.size()) {
+            mCellList.push_back(remainCellList.front());
+            remainCellList.pop_front();
+        }
+    }
+
+    /* 去掉尾部的"*"  a*b*c* ---> a*b*c */
+    tmpStr.pop_back();
+
+    mStrItem = tmpStr;
+    delAllCell();
+    parseItemToCell(mStrItem);
 }
 
 /* 8*9*b*h ---> 72*b*h */

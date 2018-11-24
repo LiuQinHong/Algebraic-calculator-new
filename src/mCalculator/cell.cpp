@@ -12,7 +12,7 @@ Cell::Cell(const std::string& strCell)
 
     if (isNumber(mStrCell))
         mCellType = NUMBER;
-    if (isDecimals(mStrCell))
+    else if (isDecimals(mStrCell))
         mCellType = NUMBER;
     else if (isAlpha(mStrCell))
         mCellType = ALPHA;
@@ -42,6 +42,13 @@ Cell::Cell(const std::string& strCell)
         mCellType = NUMBERMIXPISUBSCRIPTWITHEXPONENT;
     else
         mCellType = RESERVE;
+
+    //std::cout << "Cell::Cell(const std::string& strCell) start" << std::endl;
+    //std::cout << "mStrCell = " << mStrCell << std::endl;
+    //std::cout << "getExponentPrefix = " << getExponentPrefix() << std::endl;
+    //std::cout << "getExponent = " << getExponent() << std::endl;
+    //std::cout << "getSubscript = " << getSubscript() << std::endl;
+    //std::cout << "Cell::Cell(const std::string& strCell) end" << std::endl;
 }
 
 
@@ -344,11 +351,11 @@ std::string Cell::getExponent()
     if (iPos < 0)
         return "\0";
 
-    iPosStart = mStrCell.find('(', 0);
+    iPosStart = mStrCell.find('(', iPos);
     if (iPosStart < 0)
         return "\0";
 
-    iPosEnd = mStrCell.find(')', 0);
+    iPosEnd = mStrCell.find(')', iPos);
     if (iPosEnd < 0)
         return "\0";
 
@@ -374,10 +381,48 @@ std::string Cell::getSubscript()
     return mStrCell.substr(iPosStart, iPosEnd - iPosStart);
 }
 
-/* pi^12 */
+/* pi[123]^(123)or ((a^2 + b)*(a + c))^(a+b^3) */
+std::string Cell::getExponentPrefix()
+{
+    int iPosLeft = 0;
+    int iPosRight = 0;
+    int iFlag = 0;
+
+    int iPos = mStrCell.find('^', 0);
+    if (iPos < 0)
+        return "\0";
+
+
+    iPosLeft = mStrCell.find('(', 0);
+    if (iPosLeft < 0 || iPosLeft > iPos) {
+        return mStrCell.substr(0, iPos);
+    }
+    else {
+        for (size_t i = 0; i < mStrCell.size(); i++) {
+            iPosRight = i;
+            if (mStrCell.at(i) == '(') {
+                iFlag++;
+            }
+
+            if (mStrCell.at(i) == ')')
+                iFlag--;
+
+            if (mStrCell.at(i) == '^') {
+                if (iFlag == 0)
+                    break;
+            }
+
+        }
+        return mStrCell.substr(iPosLeft, iPosRight - iPosLeft);
+    }
+
+}
+
+/* pi^12 or (a^2 + b)^(a+b^3)*/
 void Cell::addParentheses()
 {
     int iPos = 0;
+
 
     while (1) {
         iPos = mStrCell.find('^', iPos);
@@ -390,8 +435,39 @@ void Cell::addParentheses()
         }
 
 
-        mStrCell.insert(iPos + 1, "(");
-        mStrCell += ")";
-        iPos++;
+        mStrCell.insert(++iPos, "(");
+        mStrCell.push_back(' ');
+
+        for (size_t i = iPos+1; i < mStrCell.size(); i++) {
+            if ( mStrCell.at(i) == '+' || mStrCell.at(i) == '-' || mStrCell.at(i) == '*' || mStrCell.at(i) == '/' || mStrCell.at(i) == ')'|| mStrCell.at(i) == ' ') {
+                mStrCell.insert(i, ")");
+                break;
+            }
+        }
+    }
+
+    deleteAllMark(mStrCell, " ");
+}
+
+
+
+bool Cell::operator==(Cell& cell)
+{
+    return (mStrCell == cell.mStrCell);
+}
+
+
+void Cell::deleteAllMark(std::string &s, const std::string &mark)
+{
+    size_t nSize = mark.size();
+    while(1) {
+        size_t pos = s.find(mark);
+
+        if(pos == std::string::npos)	{
+            return;
+        }
+
+        s.erase(pos, nSize);
     }
 }
+
