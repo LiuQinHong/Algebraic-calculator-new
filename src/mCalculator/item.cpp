@@ -49,7 +49,7 @@ void Item::eraseAllCell()
 bool Item::isSimpleNumber(std::string str)
 {
     for(size_t i = 0;i < str.size(); i++) {
-        if ((str.at(i) == '+') || str.at(i) == '-' || str.at(i) == '*')
+        if ((str.at(i) == '+') || str.at(i) == '-' || str.at(i) == '*' || str.at(i) == '.')
             continue;
 
         if (!isdigit(str.at(i))) {
@@ -59,30 +59,12 @@ bool Item::isSimpleNumber(std::string str)
     return true;
 }
 
-/* 1.123 */
-bool Item::isDecimals(std::string str)
-{
-    int iPos;
-    std::string front;
-    std::string back;
 
-    iPos = str.find(".");
-    if (iPos < 0)
-        return false;
-
-    front = str.substr(0, iPos);
-    back = str.substr(iPos+1);
-
-    if (!isSimpleNumber(front) || !isSimpleNumber(back))
-        return false;
-
-    return true;
-}
 /* a*b or 2*a*b */
 bool Item::isSimpleAlpha(std::string str)
 {
     for(size_t i = 0; i < str.size(); i++) {
-        if ((str.at(i) == '+') || str.at(i) == '-' || str.at(i) == '*')
+        if ((str.at(i) == '+') || str.at(i) == '-' || str.at(i) == '*' || str.at(i) == '.')
             continue;
 
         if (!isalpha(str.at(i)) && !isdigit(str.at(i))) {

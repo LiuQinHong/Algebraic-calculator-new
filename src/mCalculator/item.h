@@ -38,7 +38,6 @@ public:
     void eraseAllCell();
 
     bool isSimpleNumber(std::string str);
-    bool isDecimals(std::string str);
     bool isSimpleAlpha(std::string str);
     bool isMix(std::string str);
 
