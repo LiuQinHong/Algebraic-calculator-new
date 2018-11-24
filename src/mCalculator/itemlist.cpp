@@ -49,9 +49,10 @@ ItemList::ItemList(const std::string &str)
     Item *item = new Item(subStr);
     addItem(item);
 
+    std::cout << "mExpressionStr = " << mExpressionStr <<std::endl;
     /* cell 模块种可能会添加括号，所以需要更新信息 */
     updateFromAllItem();
-
+    std::cout << "mExpressionStr = " << mExpressionStr <<std::endl;
 }
 
 

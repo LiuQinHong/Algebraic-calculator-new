@@ -45,7 +45,7 @@ Cell::Cell(const std::string& strCell)
 
     //std::cout << "Cell::Cell(const std::string& strCell) start" << std::endl;
     //std::cout << "mStrCell = " << mStrCell << std::endl;
-    std::cout << "getExponentPrefix = " << getExponentPrefix() << std::endl;
+    //std::cout << "getExponentPrefix = " << getExponentPrefix() << std::endl;
     //std::cout << "getExponent = " << getExponent() << std::endl;
     //std::cout << "getSubscript = " << getSubscript() << std::endl;
     //std::cout << "Cell::Cell(const std::string& strCell) end" << std::endl;
@@ -438,8 +438,7 @@ std::string Cell::getExponentPrefix()
             }
 
         }
-        subStr = mStrCell.substr(iPosLeft+1, iPosRight - iPosLeft);
-        subStr.pop_back();
+        subStr = mStrCell.substr(iPosLeft, iPosRight - iPosLeft);
         return subStr;
     }
 

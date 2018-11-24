@@ -86,8 +86,10 @@ bool Item::isMix(std::string str)
 
 
 /* strItem = +3*pi*exp*a*b[0]*c^2*pi[0]*exp[0]*exp[0]^2 */
+/* (exp[0]^a*exp[0]^a*exp[0]^a + b)^(a+b)*exp*pi[0] */
 void Item::parseItemToCell(std::string& strItem)
 {
+    int iFlag = 0;
     int iPosStart = 0;
     int iPosEnd = 0;
     std::string tmpStr = strItem;
@@ -98,25 +100,30 @@ void Item::parseItemToCell(std::string& strItem)
     if (tmpStr.empty())
         return;
 
-    while (1) {
-        iPosEnd = tmpStr.find('*', iPosStart);
-        if (iPosEnd < 0)
-            break;
+    for (size_t i = 0; i < tmpStr.size(); i++) {
+        if (tmpStr.at(i) == '(') {
+            iFlag++;
+            continue;
+        }
 
-        std::string subStr = tmpStr.substr(iPosStart, iPosEnd - iPosStart);
-        if (subStr == "1") {
-            iPosEnd++;
-            iPosStart = iPosEnd;
+        if (tmpStr.at(i) == ')') {
+            iFlag--;
             continue;
         }
 
 
-        Cell *cell = new Cell(subStr);
-        addCell(cell);
+        if (tmpStr.at(i) == '*' && iFlag == 0) {
+            iPosEnd = i;
+            std::string subStr = tmpStr.substr(iPosStart, iPosEnd - iPosStart);
+            Cell *cell = new Cell(subStr);
+            addCell(cell);
+            iPosStart = iPosEnd + 1;
+        }
 
-        iPosEnd++;
-        iPosStart = iPosEnd;
+
+
     }
+
 
     std::string subStr = tmpStr.substr(iPosStart);
 
@@ -244,12 +251,19 @@ void Item::exponentFold(void)
         }
 
         /* 从目标链表中构造 a^3 */
-        stream << targetCellList.size();
-        stream >> countStr;
         if (targetCellList.size() == 1)
             tmpStr += targetCell->mStrCell + "*";
-        else
-            tmpStr += targetCell->mStrCell + "^" + countStr +"*";
+        else if (targetCell->getExponent().empty()) {
+            stream << targetCellList.size();
+            stream >> countStr;
+            tmpStr += targetCell->mStrCell + "^" +countStr +"*";
+        }
+        else {
+            stream << targetCellList.size() - 1;
+            stream >> countStr;
+            tmpStr += targetCell->getExponentPrefix() + "^" + "(" +targetCell->getExponent() + "+" +countStr + ")" +"*";
+        }
+
 
         while (targetCellList.size()) {
             Cell *tmpCell = targetCellList.front();
