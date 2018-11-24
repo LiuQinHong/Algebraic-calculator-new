@@ -4,10 +4,10 @@
 ItemList::ItemList(const std::string &str)
     :mExpressionStr(str)
 {
-    int iCount = 0;
-    std::vector<std::string> dst;
-    char acBuf[1024] = {0};
-    int iPos = 0;
+    std::string subStr;
+    int iPosStart = 0;
+    int iPosEnd = 0;
+    int iFlag = 0;
 
     if (str.empty())
         return;
@@ -19,27 +19,38 @@ ItemList::ItemList(const std::string &str)
     deleteAllMark(mExpressionStr, "\n");
 
     if ((mExpressionStr.at(0) != '+') &&  mExpressionStr.at(0) != '-') {
-        acBuf[iPos] = '+';
-        iPos++;
+        mExpressionStr = '+' + mExpressionStr;
     }
 
-    for (size_t i = 0; i < mExpressionStr.size(); i++) {
-        if ((mExpressionStr.at(i) == '+') || mExpressionStr.at(i) == '-') {
-            acBuf[iPos] = mExpressionStr.at(i);
-            iPos++;
+    /* a*(a^2 + b)^(a+b^3)*b^a+a*b*pi[0] + exp[0]^(a+b^3) */
+    for (size_t i = 1; i < mExpressionStr.size(); i++) {
+        if (mExpressionStr.at(i) == '(') {
+            iFlag++;
+            continue;
+        }
+
+
+        if (mExpressionStr.at(i) == ')') {
+            iFlag--;
+            continue;
+        }
+
+
+        if ((iFlag == 0) && ((mExpressionStr.at(i) == '+') || (mExpressionStr.at(i) == '-'))) {
+            iPosEnd = i;
+            subStr = mExpressionStr.substr(iPosStart, iPosEnd - iPosStart);
+            Item *item = new Item(subStr);
+            addItem(item);
+            iPosStart = iPosEnd;
+            continue;
         }
     }
+    subStr = mExpressionStr.substr(iPosStart);
+    Item *item = new Item(subStr);
+    addItem(item);
 
-    iCount = stringSplit(dst, mExpressionStr, "+-");
-
-    for (int i = 0; i < iCount; i++) {
-        dst[i] = acBuf[i] + dst[i];
-        Item *item = new Item(dst[i]);
-        addItem(item);
-    }
-
+    /* cell 模块种可能会添加括号，所以需要更新信息 */
     updateFromAllItem();
-    //digitalMergeAllItem();
 
 }
 
@@ -158,6 +169,11 @@ void ItemList::allExponentUnFold(void)
 
 void ItemList::allExponentFold(void)
 {
+    for(std::list<Item*>::iterator itemlist_iter = mItemList.begin(); itemlist_iter!= mItemList.end(); ++itemlist_iter) {
+        (*itemlist_iter)->exponentFold();
+    }
+
+    updateFromAllItem();
 
 }
 
