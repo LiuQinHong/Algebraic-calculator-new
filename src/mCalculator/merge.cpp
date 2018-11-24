@@ -43,9 +43,9 @@ int Merge::mergeItem()
     //整理多项式,把系数为0的删掉,系数为1的去掉系数
     makeItem(itemListTemp_i);
 
-    qDebug() << "for over";
+    //qDebug() << "for over";
     itemListTemp_i->updateFromAllItem();
-    qDebug() << "itemListTemp_i string = " << itemListTemp_i->mExpressionStr.c_str();
+    //qDebug() << "itemListTemp_i string = " << itemListTemp_i->mExpressionStr.c_str();
 
 }
 
@@ -59,28 +59,28 @@ int Merge::judgeItems(Item& origItem, Item& newItem,ItemList* itemList,std::list
     int res = -1;
     double itemp = 0,jtemp = 0;
     std::stringstream ss;
-    qDebug() << "origItem0 = " << origItem.mStrItem.c_str();
-    qDebug() << "newItem0 = " << newItem.mStrItem.c_str();
+    //qDebug() << "origItem0 = " << origItem.mStrItem.c_str();
+    //qDebug() << "newItem0 = " << newItem.mStrItem.c_str();
     res = judgeItem(origItem,newItem);
     if(res == NUMBERFLAG){/* 如果相同且为整数 */
         std::string istr = origItem.mStrItem;
         std::string jstr = newItem.mStrItem;
         if(istr.at(0) == '-'){
             istr.erase(0,1);
-            itemp = -atoi(istr.c_str());
+            itemp = -atof(istr.c_str());
         }
         else {
             istr.erase(0,1);
-            itemp = atoi(istr.c_str());
+            itemp = atof(istr.c_str());
         }
 
         if(jstr.at(0) == '-'){
             jstr.erase(0,1);
-            jtemp = -atoi(jstr.c_str());
+            jtemp = -atof(jstr.c_str());
         }
         else {
             jstr.erase(0,1);
-            jtemp = atoi(jstr.c_str());
+            jtemp = atof(jstr.c_str());
         }
 
         //合并求值并送到origItem,也就是每一次循环的首项,直接覆盖
@@ -90,8 +90,8 @@ int Merge::judgeItems(Item& origItem, Item& newItem,ItemList* itemList,std::list
         if(sumtemp >= 0){
             istr.insert(0,"+");
         }
-        qDebug() << "sumtemp = " << sumtemp;
-        qDebug() << "istr = " << istr.c_str();
+        //qDebug() << "sumtemp = " << sumtemp;
+        //qDebug() << "istr = " << istr.c_str();
         origItem.mStrItem = istr;
         //重构cell链表
         origItem.eraseAllCell();
@@ -113,18 +113,18 @@ int Merge::judgeItems(Item& origItem, Item& newItem,ItemList* itemList,std::list
         ss.clear();
         ss << coef;
         ss >> cofStr;
-        qDebug() << "cofStr = " << cofStr.c_str();
+        //qDebug() << "cofStr = " << cofStr.c_str();
         restoreCellLsist(origItem,cofStr);
 
-        qDebug() << "iter = " << *iter;
+        //qDebug() << "iter = " << *iter;
 
         if(*iter)
             itemList->mItemList.erase(iter++);
 
-        qDebug() << "iter after erase = " << *iter;
+        //qDebug() << "iter after erase = " << *iter;
 
         if(iter != itemList->mItemList.end()){
-            qDebug() << "enter judgeItems ";
+            //qDebug() << "enter judgeItems ";
             judgeItems(origItem,(*(*iter)),itemList,iter);
         }
 
@@ -143,8 +143,8 @@ int Merge::judgeItem(Item& origItem, Item& newItem)
 {
     Item origitemTemp = origItem;
     Item newtemTemp = newItem;
-    qDebug() << "origitemTemp = " << origitemTemp.mStrItem.c_str() << " : mType = " << origitemTemp.mType;
-    qDebug() << "newtemTemp = " << newtemTemp.mStrItem.c_str() << " : mType = " << newtemTemp.mType;
+    //qDebug() << "origitemTemp = " << origitemTemp.mStrItem.c_str() << " : mType = " << origitemTemp.mType;
+    //qDebug() << "newtemTemp = " << newtemTemp.mStrItem.c_str() << " : mType = " << newtemTemp.mType;
     if(origitemTemp.mType == newtemTemp.mType){
         if(origitemTemp.mType == SIMPLENUMBER){
             return NUMBERFLAG;
@@ -152,8 +152,8 @@ int Merge::judgeItem(Item& origItem, Item& newItem)
             extractItemcoef(origitemTemp,newtemTemp);//排序前去掉系数,否则会影响判断
             origitemTemp.mStrItem.erase(0,1);//去掉符号,否则会影响排序结果,临时Item,不会对原Item修改
             newtemTemp.mStrItem.erase(0,1);
-            qDebug() << "origitemTemp1 = " << origitemTemp.mStrItem.c_str();
-            qDebug() << "newtemTemp1 = " << newtemTemp.mStrItem.c_str();
+            //qDebug() << "origitemTemp1 = " << origitemTemp.mStrItem.c_str();
+            //qDebug() << "newtemTemp1 = " << newtemTemp.mStrItem.c_str();
             sort(origitemTemp.mStrItem.begin(),origitemTemp.mStrItem.end());
             sort(newtemTemp.mStrItem.begin(),newtemTemp.mStrItem.end());
             if(origitemTemp.mStrItem.compare(newtemTemp.mStrItem) == 0)
@@ -188,7 +188,7 @@ double Merge::extractItemcoef(Item &origItem,Item &nextItem)
         }
     }
     origItem.parseCelltoItem();
-    qDebug() << "after parseCelltoItem and delcoef origItem = " << origItem.mStrItem.c_str();
+    //qDebug() << "after parseCelltoItem and delcoef origItem = " << origItem.mStrItem.c_str();
     if(!oneCoefFlag)
         origCoef = 1;
     if(origItem.mStrItem.at(0) == '-')
@@ -205,7 +205,7 @@ double Merge::extractItemcoef(Item &origItem,Item &nextItem)
         }
     }
     nextItem.parseCelltoItem();
-    qDebug() << "after parseCelltoItem and delcoef nextItem = " << nextItem.mStrItem.c_str();
+    //qDebug() << "after parseCelltoItem and delcoef nextItem = " << nextItem.mStrItem.c_str();
 
     if(!oneCoefFlag)
         nextCoef = 1;
@@ -225,7 +225,7 @@ void Merge::makeItem(ItemList *itemList)
         itemList_iter!= itemList->mItemList.end(); ++itemList_iter){
 
         if((*itemList_iter)->mStrItem.at(1) == '0'){
-            qDebug() << "at(1) == " << (*itemList_iter)->mStrItem.c_str();
+            //qDebug() << "at(1) == " << (*itemList_iter)->mStrItem.c_str();
             itemList->mItemList.erase(itemList_iter++);
         }
         if(itemList_iter!= itemList->mItemList.end())
@@ -265,7 +265,7 @@ void Merge::restoreCellLsist(Item &origItem, std::string &cofStr)
 double Merge::extractItemcoeff(Item &origItem, Item &nextItem)
 {
     double origCof = 0,nextCof;
-    qDebug() << "enter coeff";
+    //qDebug() << "enter coeff";
     for(std::list<Cell*>::iterator origList_iter = origItem.mCellList.begin();
         origList_iter!= origItem.mCellList.end(); ++origList_iter){
         if((*origList_iter)->mCellType == NUMBER){
@@ -285,7 +285,7 @@ double Merge::extractItemcoeff(Item &origItem, Item &nextItem)
         }
     }
     nextItem.parseCelltoItem();
-    qDebug() << "exit coeff";
+    //qDebug() << "exit coeff";
 }
 
 /********************************************

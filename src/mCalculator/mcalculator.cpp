@@ -1,5 +1,6 @@
 #include "mcalculator.h"
 #include "ui_mcalculator.h"
+#include <transform.h>
 
 mCalculator::mCalculator(QWidget *parent) :
     QWidget(parent),
@@ -25,6 +26,12 @@ mCalculator::mCalculator(QWidget *parent) :
 
     ui->textEdit_display->setText("<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">(a+b)<span style=\" vertical-align:super;\">(a+b)</span></p>");
 
+    ItemList test("a*a*a+b*b*b");
+    Transform tt(test,true);
+    tt.transform();
+    QString QoutHtml(tt.getOutHtml()->c_str());
+
+    ui->textEdit_display->setText(QoutHtml);
 
 }
 
