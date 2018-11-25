@@ -177,6 +177,10 @@ void ItemList::allExponentFold(void)
         (*itemlist_iter)->mergeAllExponent();
     }
 
+    for(std::list<Item*>::iterator itemlist_iter = mItemList.begin(); itemlist_iter!= mItemList.end(); ++itemlist_iter) {
+        (*itemlist_iter)->calAllExponent();
+    }
+
     updateFromAllItem();
 }
 

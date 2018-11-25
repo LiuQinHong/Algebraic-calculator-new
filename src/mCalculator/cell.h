@@ -35,6 +35,8 @@ public:
     Cell(const std::string& strCell);
     Cell(const std::string& strCell, enum CellType type):mStrCell(strCell),mCellType(type){}
 
+    void updateCellType();
+
     bool isNumber(std::string str);
     bool isDecimals(std::string str);
     bool isAlpha(std::string str);
@@ -59,6 +61,7 @@ public:
     std::string getSubscript();
     std::string getExponentPrefix();
     void mergeExponent(void);
+    void calExponent(void);
 
 
     void addParentheses();

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <itemlist.h>
 #include <merge.h>
+#include <cmath>
 
 /* cell类实现方法 */
 
@@ -12,6 +13,25 @@ Cell::Cell(const std::string& strCell)
 
     addParentheses();
 
+    updateCellType();
+
+    //std::cout << "Cell::Cell(const std::string& strCell) start" << std::endl;
+    //std::cout << "mStrCell = " << mStrCell << std::endl;
+    //std::cout << "getExponentPrefix = " << getExponentPrefix() << std::endl;
+    //std::cout << "getExponent = " << getExponent() << std::endl;
+    //std::cout << "getSubscript = " << getSubscript() << std::endl;
+    //std::cout << "Cell::Cell(const std::string& strCell) end" << std::endl;
+
+    /* 底数是1的话，无论指数是多少结果都为1 */
+    if (getExponentPrefix() == "1") {
+        mStrCell = "1";
+        updateCellType();
+        return ;
+    }
+}
+
+void Cell::updateCellType(void)
+{
     if (isNumber(mStrCell))
         mCellType = NUMBER;
     else if (isDecimals(mStrCell))
@@ -44,22 +64,7 @@ Cell::Cell(const std::string& strCell)
         mCellType = NUMBERMIXPISUBSCRIPTWITHEXPONENT;
     else
         mCellType = RESERVE;
-
-    //std::cout << "Cell::Cell(const std::string& strCell) start" << std::endl;
-    //std::cout << "mStrCell = " << mStrCell << std::endl;
-    //std::cout << "getExponentPrefix = " << getExponentPrefix() << std::endl;
-    //std::cout << "getExponent = " << getExponent() << std::endl;
-    //std::cout << "getSubscript = " << getSubscript() << std::endl;
-    //std::cout << "Cell::Cell(const std::string& strCell) end" << std::endl;
-
-    /* 底数是1的话，无论指数是多少结果都为1 */
-    if (getExponentPrefix() == "1") {
-        mStrCell = "1";
-        return ;
-    }
 }
-
-
 /* 1 */
 bool Cell::isNumber(std::string str)
 {
@@ -464,7 +469,51 @@ void Cell::mergeExponent(void)
 
     merge.mergeItem();
 
-    setExponent(itemList.mExpressionStr.substr(1));
+    if (itemList.mExpressionStr.empty()) {
+        setExponent("0");
+    } else {
+        setExponent(itemList.mExpressionStr.substr(1));
+    }
+
+
+}
+
+
+void Cell::calExponent(void)
+{
+    std::string strExponent = getExponent();
+    std::string strExponentPrefix = getExponentPrefix();
+    std::stringstream streamExponent;
+    std::stringstream streamExponentPrefix;
+    std::stringstream streamSum;
+    int iExponent;
+    int iExponentPrefix;
+    double dwSum;
+
+    if (strExponent.empty() || strExponentPrefix.empty())
+        return;
+
+    if (strExponent == "0" || strExponentPrefix == "1") {
+        mStrCell = "1";
+        return;
+    }
+
+
+    if (isNumber(strExponent) && isNumber(strExponentPrefix)) {
+        streamExponent << strExponent;
+        streamExponentPrefix << strExponentPrefix;
+
+        streamExponent >> iExponent;
+        streamExponentPrefix >> iExponentPrefix;
+
+        if (iExponent < 0)
+            return;
+
+        dwSum = pow(iExponentPrefix, iExponent);
+        streamSum << dwSum;
+        streamSum >> mStrCell;
+    }
+
 }
 
 
