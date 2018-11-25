@@ -94,7 +94,7 @@ int Merge::judgeItems(Item& origItem, Item& newItem,ItemList* itemList,std::list
         //qDebug() << "istr = " << istr.c_str();
         origItem.mStrItem = istr;
         //重构cell链表
-        origItem.eraseAllCell();
+        origItem.delAllCell();
         origItem.parseItemToCell(origItem.mStrItem);
         if(*iter)
             itemList->mItemList.erase(iter++);
@@ -114,6 +114,8 @@ int Merge::judgeItems(Item& origItem, Item& newItem,ItemList* itemList,std::list
         ss << coef;
         ss >> cofStr;
         //qDebug() << "cofStr = " << cofStr.c_str();
+        //if(coef >= 0)
+        //    cofStr.insert(0,"+");
         restoreCellLsist(origItem,cofStr);
 
         //qDebug() << "iter = " << *iter;
@@ -240,21 +242,23 @@ void Merge::makeItem(ItemList *itemList)
 *********************************************/
 void Merge::restoreCellLsist(Item &origItem, std::string &cofStr)
 {
-    std::string cofStrTemp = cofStr;
-    cofStrTemp.erase(0,1);
-    //Cell cofCell(cofStrTemp);
     cofStr.append("*");
     if(cofStr.at(0) == '-'){
         origItem.mStrItem.erase(0,1);
         origItem.mStrItem.insert(0,cofStr);
     }
     else{
+        //qDebug() << "origItem.mStrItem0 = " << origItem.mStrItem.c_str();
         origItem.mStrItem.replace(0,1,"+");
+        //qDebug() << "origItem.mStrItem1 = " << origItem.mStrItem.c_str();
         origItem.mStrItem.insert(1,cofStr);
+        //qDebug() << "origItem.mStrItem2 = " << origItem.mStrItem.c_str();
     }
-    //origItem.mCellList.push_front(&cofCell);
-    origItem.eraseAllCell();
+
+    origItem.delAllCell();
+    //qDebug() << "origItem.mStrItem = " << origItem.mStrItem.c_str();
     origItem.parseItemToCell(origItem.mStrItem);
+    //qDebug() << "origItem.mStrItem = " << origItem.mStrItem.c_str();
 }
 
 /********************************************
