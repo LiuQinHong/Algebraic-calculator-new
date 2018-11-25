@@ -1,5 +1,7 @@
 #include <cell.h>
 #include <iostream>
+#include <itemlist.h>
+#include <merge.h>
 
 /* cell类实现方法 */
 
@@ -387,6 +389,11 @@ std::string Cell::getExponent()
     }
 }
 
+void Cell::setExponent(std::string strExponent)
+{
+    mStrCell = getExponentPrefix() + "^(" + strExponent +")";
+}
+
 /* a[123] exp[123] pi[123]^(123) */
 std::string Cell::getSubscript()
 {
@@ -443,6 +450,23 @@ std::string Cell::getExponentPrefix()
     }
 
 }
+
+
+void Cell::mergeExponent(void)
+{
+    std::string strExponent = getExponent();
+
+    if (strExponent.empty())
+        return;
+
+    ItemList itemList(strExponent);
+    Merge merge(&itemList);
+
+    merge.mergeItem();
+
+    setExponent(itemList.mExpressionStr.substr(1));
+}
+
 
 /* pi^12 or (a^2 + b)^(a+b^3)*/
 void Cell::addParentheses()

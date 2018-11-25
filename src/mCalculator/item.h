@@ -47,10 +47,13 @@ public:
     void parseCelltoItem();
     void exponentUnfold(void);
     void exponentFold(void);
+    void mergeAllExponent(void);
+
     void digitalMerge(void);
 
     void updateFromAllCell(void);
     void printAllCell(void);
+
 };
 
 

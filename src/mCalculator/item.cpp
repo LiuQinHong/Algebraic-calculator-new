@@ -1,5 +1,6 @@
 #include <item.h>
 #include <qdebug.h>
+#include <sstream>
 /*
  *  单项式单元实现方法
 */
@@ -215,12 +216,15 @@ void Item::exponentUnfold(void)
 
 /* +a*a*b*b ---> +a^(2)*b^(2) */
 /* +f*exp[0]*a*b*exp[0]^6*exp[0]*exp[0]*pi[0]*pi[0]*pi[0]*pi[0]*a*a*a */
+/* exp^(a*b+c^q)*exp^2*exp*a^(c*d^a)*a*a*a^5*(a+b^y)^r*(a+b^y)^(a+b) */
 void Item::exponentFold(void)
 {
     std::list<Cell*> targetCellList;
     std::list<Cell*> remainCellList;
     Cell *curCell = NULL;
-    Cell *targetCell = NULL;
+    std::string targetStr;
+    std::string targetTmpStr;
+    std::string curStr;
     std::string tmpStr;
     std::string countStr;
     std::stringstream stream;
@@ -235,41 +239,62 @@ void Item::exponentFold(void)
             mCellList.pop_front();
 
             if (targetCellList.empty()) {
-                targetCell = curCell;
+                if (curCell->getExponentPrefix().empty()) {
+                    targetStr = curCell->mStrCell;
+                } else {
+                    targetStr = curCell->getExponentPrefix();
+                }
+                targetTmpStr = targetStr;
+                sort(targetTmpStr.begin(),targetTmpStr.end());
                 targetCellList.push_back(curCell);
                 continue;
             }
 
-            if (*curCell == *targetCell) {
+
+
+            if (curCell->getExponentPrefix().empty()) {
+                curStr = curCell->mStrCell;
+            } else {
+                curStr = curCell->getExponentPrefix();
+            }
+
+            sort(curStr.begin(),curStr.end());
+            if ((curStr == targetTmpStr)) {
                 targetCellList.push_back(curCell);
                 continue;
-            }
-            else {
+            } else {
                 remainCellList.push_back(curCell);
                 continue;
             }
         }
 
-        /* 从目标链表中构造 a^3 */
-        if (targetCellList.size() == 1)
+
+        if (targetCellList.size() == 1) {
+            Cell *targetCell = targetCellList.front();
+            targetCellList.pop_front();
             tmpStr += targetCell->mStrCell + "*";
-        else if (targetCell->getExponent().empty()) {
-            stream << targetCellList.size();
-            stream >> countStr;
-            tmpStr += targetCell->mStrCell + "^" +countStr +"*";
+            delete targetCell;
         }
         else {
-            stream << targetCellList.size() - 1;
-            stream >> countStr;
-            tmpStr += targetCell->getExponentPrefix() + "^" + "(" +targetCell->getExponent() + "+" +countStr + ")" +"*";
-        }
+            tmpStr += targetStr + "^" + "(";
+
+            while (targetCellList.size()) {
+                Cell *targetCell = targetCellList.front();
+                targetCellList.pop_front();
+
+                if (targetCell->getExponent().empty()) {
+                    tmpStr += "1+";
+                } else {
+                    tmpStr += targetCell->getExponent() + "+";
+                }
 
 
-        while (targetCellList.size()) {
-            Cell *tmpCell = targetCellList.front();
-            targetCellList.pop_front();
-            delete tmpCell;
+                delete targetCell;
+            }
+            tmpStr.pop_back();
+            tmpStr += ")*";
         }
+
 
         while (remainCellList.size()) {
             mCellList.push_back(remainCellList.front());
@@ -284,6 +309,15 @@ void Item::exponentFold(void)
     delAllCell();
     parseItemToCell(mStrItem);
 }
+
+void Item::mergeAllExponent(void)
+{
+    for(std::list<Cell*>::iterator celllist_iter = mCellList.begin(); celllist_iter!= mCellList.end(); ++celllist_iter) {
+        (*celllist_iter)->mergeExponent();
+    }
+    updateFromAllCell();
+}
+
 
 /* 8*9*b*h ---> 72*b*h */
 void Item::digitalMerge(void)
@@ -338,3 +372,4 @@ void Item::printAllCell(void)
         std::cout << (*celllist_iter)->mStrCell << ":" << (*celllist_iter)->mCellType << std::endl;
     }
 }
+

@@ -49,10 +49,8 @@ ItemList::ItemList(const std::string &str)
     Item *item = new Item(subStr);
     addItem(item);
 
-    std::cout << "mExpressionStr = " << mExpressionStr <<std::endl;
     /* cell 模块种可能会添加括号，所以需要更新信息 */
     updateFromAllItem();
-    std::cout << "mExpressionStr = " << mExpressionStr <<std::endl;
 }
 
 
@@ -174,8 +172,11 @@ void ItemList::allExponentFold(void)
         (*itemlist_iter)->exponentFold();
     }
 
-    updateFromAllItem();
+    for(std::list<Item*>::iterator itemlist_iter = mItemList.begin(); itemlist_iter!= mItemList.end(); ++itemlist_iter) {
+        (*itemlist_iter)->mergeAllExponent();
+    }
 
+    updateFromAllItem();
 }
 
 

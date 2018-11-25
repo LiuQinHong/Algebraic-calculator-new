@@ -55,8 +55,11 @@ public:
     bool isNumberMixPISubscriptWithExponent(std::string str);
 
     std::string getExponent();
+    void setExponent(std::string strExponent);
     std::string getSubscript();
     std::string getExponentPrefix();
+    void mergeExponent(void);
+
 
     void addParentheses();
 
