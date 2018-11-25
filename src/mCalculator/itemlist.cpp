@@ -137,8 +137,9 @@ void ItemList::digitalMergeAllItem(void)
 void ItemList::printAllItem(void)
 {
     std::cout << "==========printAllItem start==========" << std::endl;
+    std::cout << "mExpressionStr = " << mExpressionStr << std::endl;
     for(std::list<Item*>::iterator itemlist_iter = mItemList.begin(); itemlist_iter!= mItemList.end(); ++itemlist_iter) {
-        std::cout << (*itemlist_iter)->mStrItem << std::endl;
+        std::cout << "mStrItem = " <<(*itemlist_iter)->mStrItem << std::endl;
         (*itemlist_iter)->printAllCell();
     }
     std::cout << "==========printAllItem end==========" << std::endl;
