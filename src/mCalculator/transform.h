@@ -17,13 +17,17 @@ class Transform : public QObject
     Q_OBJECT
 
 public:
-    Transform(ItemList &itemList,bool denominatorFlag):transItemList(itemList),denominatorFlag(denominatorFlag){}
+    Transform(ItemList &itemList,bool denominatorFlag);
 
     ~Transform();
 
     bool transform();
 
-    void toNormal(Cell &cell);
+    void toSymbol(Item &item);
+
+    void toNormal(Item &item);
+
+    void toUnderNormal(Item &item);
 
     void toSuper(Cell &cell);
 
@@ -55,6 +59,8 @@ private:
     std::string *outHtml;
     ItemList &transItemList;
     bool denominatorFlag;
+    int itemCount;
+    int i = 0;
 };
 
 #endif // TRANSFORM_H
