@@ -23,6 +23,8 @@ public:
 
     bool transform();
 
+    bool transforms(ItemList &itemList);
+
     void toSymbol(Item &item);
 
     void toNormal(Cell &cell);
@@ -43,6 +45,12 @@ public:
 
     void toUnderSubsuper(Cell &cell);
 
+    bool toComplexList(Cell &cell);
+
+    void toComplexListSuper(Cell &cell);
+
+    void toComplexListUnderSuper(Cell &cell);
+
     void transformItem(Item &item);
 
     std::string *getOutHtml();
@@ -60,7 +68,7 @@ private:
     ItemList &transItemList;
     bool denominatorFlag;
     int itemCount;
-    int i = 0;
+
 };
 
 #endif // TRANSFORM_H

@@ -8,6 +8,7 @@
 
 Transform::Transform(ItemList &itemList, bool denominatorFlag):transItemList(itemList),denominatorFlag(denominatorFlag){
     itemCount = itemList.mItemList.size();
+    outHtml = new std::string;
 }
 
 Transform::~Transform()
@@ -21,39 +22,28 @@ Transform::~Transform()
 */
 bool Transform::transform()
 {
-    outHtml = new std::string;
+    bool res;
+    *outHtml += pStart;
+    res = transforms(transItemList);
+    *outHtml += pEnd;
+    return res;
+}
 
-    for(std::list<Item*>::iterator itemList_iter = transItemList.mItemList.begin();
-        itemList_iter!= transItemList.mItemList.end(); ++itemList_iter){
+bool Transform::transforms(ItemList &itemList)
+{
+    int i = 0;
+    for(std::list<Item*>::iterator itemList_iter = itemList.mItemList.begin();
+        itemList_iter!= itemList.mItemList.end(); ++itemList_iter){
         qDebug() << "tranfrom start!";
+        if(i != 0)
+            toSymbol(*(*itemList_iter));
+
+        transformItem(*(*itemList_iter));
+
         i++;
-        if(i == 1)
-            *outHtml += pStart;
-
-        toSymbol(*(*itemList_iter));
-
-        if((*itemList_iter)->mType == MIX)
-            transformItem(*(*itemList_iter));
-        else {
-
-        }
-        if(i == itemCount)
-            *outHtml += pEnd;
-
     }
 
     qDebug() << "tranfrom over!";
-    /*
-    *outHtml += pStart;
-    *outHtml += "a";
-    *outHtml += spanStart;
-    *outHtml += super;
-    *outHtml += spanMid;
-    *outHtml += "b";
-    *outHtml += spanEnd;
-    *outHtml += pEnd;
-    */
-
     return true;
 }
 
@@ -70,18 +60,27 @@ void Transform::toSymbol(Item &item)
         *outHtml += item.mStrItem.at(0);
 }
 
+void Transform::toNormal(Cell &cell)
+{
+    if(cell.mCellType != PI)
+        *outHtml += cell.mStrCell;
+    else
+        *outHtml += "π";
+}
+
 void Transform::toUnderNormal(Cell &cell)
 {
+
     *outHtml += spanStart;
     *outHtml += underLine;
     *outHtml += spanMid;
-    *outHtml += cell.mStrCell;
+    if(cell.mCellType != PI)
+        *outHtml += cell.mStrCell;
+    else if(cell.mCellType == EXP)
+        *outHtml += "e";
+    else
+        *outHtml += "π";
     *outHtml += spanEnd;
-}
-
-void Transform::toNormal(Cell &cell)
-{
-    *outHtml += cell.mStrCell;
 }
 
 void Transform::toSuper(Cell &cell)
@@ -89,7 +88,12 @@ void Transform::toSuper(Cell &cell)
     if(cell.getExponent() == "1/2")
         *outHtml += "√";
     //获得前缀
-    *outHtml += cell.getExponentPrefix();
+    if(cell.mCellType == EXPWITHEXPONENT)
+        *outHtml += "e";
+    else if(cell.mCellType == PIWITHEXPONENT)
+        *outHtml += "π";
+    else
+        *outHtml += cell.getExponentPrefix();
     if(cell.getExponent() != "1/2"){
         //获得幂
         *outHtml += spanStart;
@@ -99,6 +103,32 @@ void Transform::toSuper(Cell &cell)
         *outHtml += spanEnd;
     }
 
+}
+
+void Transform::toUnderSuper(Cell &cell)
+{
+    //获得前缀
+    *outHtml += spanStart;
+    *outHtml += underLine;
+    *outHtml += spanMid;
+    if(cell.getExponent() == "1/2")
+        *outHtml += "√";
+    if(cell.mCellType == EXPWITHEXPONENT)
+        *outHtml += "e";
+    else if(cell.mCellType == PIWITHEXPONENT)
+        *outHtml += "π";
+    else
+        *outHtml += cell.getExponentPrefix();
+    *outHtml += spanEnd;
+    //获得幂
+     if(cell.getExponent() != "1/2"){
+        *outHtml += spanStart;
+        *outHtml += super;
+        *outHtml += underLine;
+        *outHtml += spanMid;
+        *outHtml += cell.getExponent();//幂
+        *outHtml += spanEnd;
+     }
 }
 
 void Transform::toSub(Cell &cell)
@@ -118,6 +148,28 @@ void Transform::toSub(Cell &cell)
     *outHtml += spanEnd;
 }
 
+void Transform::toUnderSub(Cell &cell)
+{
+    //前缀
+    *outHtml += spanStart;
+    *outHtml += underLine;
+    *outHtml += spanMid;
+    if(cell.mCellType == NUMBERMIXALPHASUBSCRIPT)
+        *outHtml += cell.mStrCell.at(0);
+    else if(cell.mCellType == NUMBERMIXPISUBSCRIPT)
+        *outHtml += cell.mStrCell.substr(0,2);
+    else
+        *outHtml += cell.mStrCell.substr(0,3);
+    *outHtml += spanEnd;
+    //获得下标
+    *outHtml += spanStart;
+    *outHtml += sub;
+    *outHtml += underLine;
+    *outHtml += spanMid;
+    *outHtml += cell.getSubscript();//下标
+    *outHtml += spanEnd;
+}
+
 void Transform::toSubSuper(Cell &cell)
 {
     if(cell.getExponent() == "1/2")
@@ -126,9 +178,9 @@ void Transform::toSubSuper(Cell &cell)
     if(cell.mCellType == NUMBERMIXALPHASUBSCRIPTWITHEXPONENT)
         *outHtml += cell.getExponentPrefix().at(0);
     else if(cell.mCellType == NUMBERMIXPISUBSCRIPTWITHEXPONENT)
-        *outHtml += cell.getExponentPrefix().substr(0,2);
+        *outHtml += "π";
     else
-        *outHtml += cell.getExponentPrefix().substr(0,3);
+        *outHtml += "e";
     //获得下标
     *outHtml += spanStart;
     *outHtml += sub;
@@ -156,49 +208,6 @@ void Transform::toUnderline(Cell &cell)
     *outHtml += spanEnd;
 }
 
-void Transform::toUnderSuper(Cell &cell)
-{
-    //获得前缀
-    *outHtml += spanStart;
-    *outHtml += underLine;
-    *outHtml += spanMid;
-    if(cell.getExponent() == "1/2")
-        *outHtml += "√";
-    *outHtml += cell.getExponentPrefix();
-    *outHtml += spanEnd;
-    //获得幂
-     if(cell.getExponent() != "1/2"){
-        *outHtml += spanStart;
-        *outHtml += super;
-        *outHtml += underLine;
-        *outHtml += spanMid;
-        *outHtml += cell.getExponent();//幂
-        *outHtml += spanEnd;
-     }
-}
-
-void Transform::toUnderSub(Cell &cell)
-{
-    //前缀
-    *outHtml += spanStart;
-    *outHtml += underLine;
-    *outHtml += spanMid;
-    if(cell.mCellType == NUMBERMIXALPHASUBSCRIPT)
-        *outHtml += cell.mStrCell.at(0);
-    else if(cell.mCellType == NUMBERMIXPISUBSCRIPT)
-        *outHtml += cell.mStrCell.substr(0,2);
-    else
-        *outHtml += cell.mStrCell.substr(0,3);
-    *outHtml += spanEnd;
-    //获得下标
-    *outHtml += spanStart;
-    *outHtml += sub;
-    *outHtml += underLine;
-    *outHtml += spanMid;
-    *outHtml += cell.getSubscript();//下标
-    *outHtml += spanEnd;
-}
-
 void Transform::toUnderSubsuper(Cell &cell)
 {
     //获得前缀
@@ -211,9 +220,9 @@ void Transform::toUnderSubsuper(Cell &cell)
     if(cell.mCellType == NUMBERMIXALPHASUBSCRIPTWITHEXPONENT)
         *outHtml += cell.getExponentPrefix().at(0);
     else if(cell.mCellType == NUMBERMIXPISUBSCRIPTWITHEXPONENT)
-        *outHtml += cell.getExponentPrefix().substr(0,2);
+        *outHtml += "e";
     else
-        *outHtml += cell.getExponentPrefix().substr(0,3);
+        *outHtml += "π";
     *outHtml += spanEnd;
     //获得下标
     *outHtml += spanStart;
@@ -233,6 +242,63 @@ void Transform::toUnderSubsuper(Cell &cell)
     }
 }
 
+bool Transform::toComplexList(Cell &cell)
+{
+    bool res;
+    std::string str = cell.getExponentPrefix().erase(0,1);
+    str.erase(str.length()-1,str.length());
+    ItemList complexList(str);
+    *outHtml += spanStart;
+    *outHtml += underLine;
+    *outHtml += spanMid;
+    *outHtml += "(";
+    *outHtml += spanEnd;
+    res = transforms(complexList);
+    *outHtml += spanStart;
+    *outHtml += underLine;
+    *outHtml += spanMid;
+    *outHtml += ")";
+    *outHtml += spanEnd;
+
+    return res;
+}
+
+void Transform::toComplexListSuper(Cell &cell)
+{
+    if(cell.getExponent() == "1/2"){
+        *outHtml += "√";
+    }
+    //获得幂
+     if(cell.getExponent() != "1/2"){
+        *outHtml += spanStart;
+        *outHtml += super;
+        *outHtml += underLine;
+        *outHtml += spanMid;
+        *outHtml += cell.getExponent();//幂
+        *outHtml += spanEnd;
+     }
+}
+
+void Transform::toComplexListUnderSuper(Cell &cell)
+{
+    if(cell.getExponent() == "1/2"){
+        *outHtml += spanStart;
+        *outHtml += underLine;
+        *outHtml += spanMid;
+        *outHtml += "√";
+        *outHtml += spanEnd;
+    }
+    //获得幂
+     if(cell.getExponent() != "1/2"){
+        *outHtml += spanStart;
+        *outHtml += super;
+        *outHtml += underLine;
+        *outHtml += spanMid;
+        *outHtml += cell.getExponent();//幂
+        *outHtml += spanEnd;
+     }
+}
+
 void Transform::transformItem(Item &item)
 {
 
@@ -245,7 +311,9 @@ void Transform::transformItem(Item &item)
         case ALPHA:
         case NUMBER:
              if(denominatorFlag)
-
+                 toUnderNormal(*(*cellList_iter));
+             else
+                 toNormal(*(*cellList_iter));
 
             break;
         //有下标: a[0] exp[0] pi[0]
@@ -259,7 +327,6 @@ void Transform::transformItem(Item &item)
 
             break;
         //普通带幂: a^2 2^a exp^2 pi^2
-        case RESERVE:
         case PIWITHEXPONENT:
         case EXPWITHEXPONENT:
         case ALPHAWITHEXPONENT:
@@ -280,8 +347,15 @@ void Transform::transformItem(Item &item)
                 toSubSuper(*(*cellList_iter));
 
             break;
-        default:
+        case RESERVE:
+            toComplexList(*(*cellList_iter));
+            if(denominatorFlag)
+                toComplexListUnderSuper(*(*cellList_iter));
+            else
+                toComplexListSuper(*(*cellList_iter));
 
+            break;
+        default:
             break;
         }
     }
