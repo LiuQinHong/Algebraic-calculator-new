@@ -25,9 +25,9 @@ public:
 
     void toSymbol(Item &item);
 
-    void toNormal(Item &item);
+    void toNormal(Cell &cell);
 
-    void toUnderNormal(Item &item);
+    void toUnderNormal(Cell &cell);
 
     void toSuper(Cell &cell);
 

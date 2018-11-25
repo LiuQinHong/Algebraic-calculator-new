@@ -35,10 +35,7 @@ bool Transform::transform()
         if((*itemList_iter)->mType == MIX)
             transformItem(*(*itemList_iter));
         else {
-            if(denominatorFlag)
-                toUnderNormal(*(*itemList_iter));
-            else
-                toNormal(*(*itemList_iter));
+
         }
         if(i == itemCount)
             *outHtml += pEnd;
@@ -73,18 +70,18 @@ void Transform::toSymbol(Item &item)
         *outHtml += item.mStrItem.at(0);
 }
 
-void Transform::toUnderNormal(Item &item)
+void Transform::toUnderNormal(Cell &cell)
 {
     *outHtml += spanStart;
     *outHtml += underLine;
     *outHtml += spanMid;
-    *outHtml += item.mStrItem.erase(0,1);
+    *outHtml += cell.mStrCell;
     *outHtml += spanEnd;
 }
 
-void Transform::toNormal(Item &item)
+void Transform::toNormal(Cell &cell)
 {
-    *outHtml += item.mStrItem;
+    *outHtml += cell.mStrCell;
 }
 
 void Transform::toSuper(Cell &cell)
@@ -243,6 +240,14 @@ void Transform::transformItem(Item &item)
         cellList_iter!= item.mCellList.end(); ++cellList_iter){
 
         switch ((*cellList_iter)->mCellType) {
+        case PI:
+        case EXP:
+        case ALPHA:
+        case NUMBER:
+             if(denominatorFlag)
+
+
+            break;
         //有下标: a[0] exp[0] pi[0]
         case NUMBERMIXPISUBSCRIPT:
         case NUMBERMIXEXPSUBSCRIPT:
