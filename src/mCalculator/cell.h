@@ -3,7 +3,7 @@
 
 #include <string>
 
-/* +1*a*exp*pi*a[0]*exp[0]*pi[0]*1^a*a^2*exp^2*pi^2*a[0]^2*exp[0]^2*pi[0]^2 */
+/* +1*a*exp*pi*a[0]*exp[0]*pi[0]*1^a*a^2*exp^2*pi^2*(a+b^(c))^a*a^(a+b^(c))*(a+b^(c))^(a+b^(c))*a[0]^2*exp[0]^2*pi[0]^2 */
 enum CellType {
     NUMBER,								// 数字 : 1
     ALPHA,								// 字母 : a
@@ -18,6 +18,10 @@ enum CellType {
     ALPHAWITHEXPONENT,					// 字母带幂 : a^2
     EXPWITHEXPONENT,					// exp带幂 : exp^2
     PIWITHEXPONENT,						// 圆周率带幂 ：pi^2
+
+    COMPLEXPREFIXWITHSIMPLEEXPONENT,    // (a+b^(c))^a
+    SIMPLEPREFIXWITHCOMPLEXEXPONENT,    // a^(a+b^(c))
+    COMPLEXPREFIXWITHCOMPLEXEXPONENT,   // (a+b^(c))^(a+b^(c))
 
     NUMBERMIXALPHASUBSCRIPTWITHEXPONENT,// 带下标的字母	: a[0]^2
     NUMBERMIXEXPSUBSCRIPTWITHEXPONENT,	// 带下标的字母	: exp[0]^2
@@ -55,6 +59,13 @@ public:
     bool isNumberMixAlphaSubscriptWithExponent(std::string str);
     bool isNumberMixEXPSubscriptWithExponent(std::string str);
     bool isNumberMixPISubscriptWithExponent(std::string str);
+
+    bool isComplexPrefixWithSimpleExponent(std::string str);
+    bool isSimplePrefixWithComplexExponent(std::string str);
+    bool isComplexPrefixWithComplexExponent(std::string str);
+
+    bool isComplex(std::string str);
+    bool isSimple(std::string str);
 
     std::string getExponent();
     void setExponent(std::string strExponent);

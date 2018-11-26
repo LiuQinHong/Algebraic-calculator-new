@@ -62,6 +62,12 @@ void Cell::updateCellType(void)
         mCellType = NUMBERMIXEXPSUBSCRIPTWITHEXPONENT;
     else if (isNumberMixPISubscriptWithExponent(mStrCell))
         mCellType = NUMBERMIXPISUBSCRIPTWITHEXPONENT;
+    else if (isComplexPrefixWithSimpleExponent(mStrCell))
+        mCellType = COMPLEXPREFIXWITHSIMPLEEXPONENT;
+    else if (isSimplePrefixWithComplexExponent(mStrCell))
+        mCellType = SIMPLEPREFIXWITHCOMPLEXEXPONENT;
+    else if (isComplexPrefixWithComplexExponent(mStrCell))
+        mCellType = COMPLEXPREFIXWITHCOMPLEXEXPONENT;
     else
         mCellType = RESERVE;
 }
@@ -236,6 +242,7 @@ bool Cell::isNumberWithExponent(std::string str)
 /* a^(2) */
 bool Cell::isAlphaWithExponent(std::string str)
 {
+    std::string strExponent = getExponent();
     int iPos;
 
     if (!isalpha(str.at(0)))
@@ -247,6 +254,9 @@ bool Cell::isAlphaWithExponent(std::string str)
 
     /* 这种情况下'^'一定在pos = 1 处*/
     if (iPos != 1)
+        return false;
+
+    if (isComplex(strExponent))
         return false;
 
     return true;
@@ -351,6 +361,109 @@ bool Cell::isNumberMixPISubscriptWithExponent(std::string str)
 
     return true;
 }
+
+
+/* (a+b^(c))^a */
+bool Cell::isComplexPrefixWithSimpleExponent(std::string str)
+{
+    std::string strPrefix = getExponentPrefix();
+    std::string strExponent = getExponent();
+
+    if (strPrefix.empty() || strExponent.empty())
+        return false;
+
+
+    if (isSimple(strExponent) && isComplex(strPrefix))
+        return true;
+    else
+        return false;
+}
+
+/* a^(a+b^(c)) */
+bool Cell::isSimplePrefixWithComplexExponent(std::string str)
+{
+    std::string strPrefix = getExponentPrefix();
+    std::string strExponent = getExponent();
+
+    if (strPrefix.empty() || strExponent.empty())
+        return false;
+
+    if (isSimple(strPrefix) && isComplex(strExponent))
+        return true;
+    else
+        return false;
+}
+
+/* (a+b^(c))^(a+b^(c)) */
+bool Cell::isComplexPrefixWithComplexExponent(std::string str)
+{
+    std::string strPrefix = getExponentPrefix();
+    std::string strExponent = getExponent();
+
+    if (strPrefix.empty() || strExponent.empty())
+        return false;
+
+    if (isComplex(strPrefix) && isComplex(strExponent))
+        return true;
+    else
+        return false;
+}
+
+
+bool Cell::isComplex(std::string str)
+{
+    bool iFlagComplex = false;
+    int iPos;
+
+    iPos = str.find("+");
+    if (iPos > 0)
+        iFlagComplex = true;
+
+    iPos = str.find("-");
+    if (iPos > 0)
+        iFlagComplex = true;
+
+    iPos = str.find("*");
+    if (iPos > 0)
+        iFlagComplex = true;
+
+    iPos = str.find("/");
+    if (iPos > 0)
+        iFlagComplex = true;
+
+    iPos = str.find("^");
+    if (iPos > 0)
+        iFlagComplex = true;
+
+    return iFlagComplex;
+}
+
+bool Cell::isSimple(std::string str)
+{
+    bool iFlagSimple = false;
+
+    if (isNumber(str))
+        iFlagSimple = true;
+    else if (isDecimals(str))
+        iFlagSimple = true;
+    else if (isAlpha(str))
+        iFlagSimple = true;
+    else if (isExp(str))
+        iFlagSimple = true;
+    else if (isPI(str))
+        iFlagSimple = true;
+    else if (isNumberMixAlphaSubscript(str))
+        iFlagSimple = true;
+    else if (isNumberMixEXPSubscript(str))
+        iFlagSimple = true;
+    else if (isNumberMixPISubscript(str))
+        iFlagSimple = true;
+    else
+        iFlagSimple = false;
+
+    return iFlagSimple;
+}
+
 
 
 /* a^(12) or a^(1/2) */

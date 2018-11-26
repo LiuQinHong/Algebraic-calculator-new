@@ -226,8 +226,6 @@ void Item::exponentFold(void)
     std::string targetTmpStr;
     std::string curStr;
     std::string tmpStr;
-    std::string countStr;
-    std::stringstream stream;
 
     tmpStr = mStrItem.at(0);
 
