@@ -2,6 +2,7 @@
 #include <iostream>
 #include <itemlist.h>
 #include <merge.h>
+#include <cmath>
 
 /* cell类实现方法 */
 
@@ -12,6 +13,25 @@ Cell::Cell(const std::string& strCell)
 
     addParentheses();
 
+    updateCellType();
+
+    //std::cout << "Cell::Cell(const std::string& strCell) start" << std::endl;
+    //std::cout << "mStrCell = " << mStrCell << std::endl;
+    //std::cout << "getExponentPrefix = " << getExponentPrefix() << std::endl;
+    //std::cout << "getExponent = " << getExponent() << std::endl;
+    //std::cout << "getSubscript = " << getSubscript() << std::endl;
+    //std::cout << "Cell::Cell(const std::string& strCell) end" << std::endl;
+
+    /* 底数是1的话，无论指数是多少结果都为1 */
+    if (getExponentPrefix() == "1") {
+        mStrCell = "1";
+        updateCellType();
+        return ;
+    }
+}
+
+void Cell::updateCellType(void)
+{
     if (isNumber(mStrCell))
         mCellType = NUMBER;
     else if (isDecimals(mStrCell))
@@ -42,24 +62,15 @@ Cell::Cell(const std::string& strCell)
         mCellType = NUMBERMIXEXPSUBSCRIPTWITHEXPONENT;
     else if (isNumberMixPISubscriptWithExponent(mStrCell))
         mCellType = NUMBERMIXPISUBSCRIPTWITHEXPONENT;
+    else if (isComplexPrefixWithSimpleExponent(mStrCell))
+        mCellType = COMPLEXPREFIXWITHSIMPLEEXPONENT;
+    else if (isSimplePrefixWithComplexExponent(mStrCell))
+        mCellType = SIMPLEPREFIXWITHCOMPLEXEXPONENT;
+    else if (isComplexPrefixWithComplexExponent(mStrCell))
+        mCellType = COMPLEXPREFIXWITHCOMPLEXEXPONENT;
     else
         mCellType = RESERVE;
-
-    //std::cout << "Cell::Cell(const std::string& strCell) start" << std::endl;
-    //std::cout << "mStrCell = " << mStrCell << std::endl;
-    //std::cout << "getExponentPrefix = " << getExponentPrefix() << std::endl;
-    //std::cout << "getExponent = " << getExponent() << std::endl;
-    //std::cout << "getSubscript = " << getSubscript() << std::endl;
-    //std::cout << "Cell::Cell(const std::string& strCell) end" << std::endl;
-
-    /* 底数是1的话，无论指数是多少结果都为1 */
-    if (getExponentPrefix() == "1") {
-        mStrCell = "1";
-        return ;
-    }
 }
-
-
 /* 1 */
 bool Cell::isNumber(std::string str)
 {
@@ -231,6 +242,7 @@ bool Cell::isNumberWithExponent(std::string str)
 /* a^(2) */
 bool Cell::isAlphaWithExponent(std::string str)
 {
+    std::string strExponent = getExponent();
     int iPos;
 
     if (!isalpha(str.at(0)))
@@ -242,6 +254,9 @@ bool Cell::isAlphaWithExponent(std::string str)
 
     /* 这种情况下'^'一定在pos = 1 处*/
     if (iPos != 1)
+        return false;
+
+    if (isComplex(strExponent))
         return false;
 
     return true;
@@ -346,6 +361,109 @@ bool Cell::isNumberMixPISubscriptWithExponent(std::string str)
 
     return true;
 }
+
+
+/* (a+b^(c))^a */
+bool Cell::isComplexPrefixWithSimpleExponent(std::string str)
+{
+    std::string strPrefix = getExponentPrefix();
+    std::string strExponent = getExponent();
+
+    if (strPrefix.empty() || strExponent.empty())
+        return false;
+
+
+    if (isSimple(strExponent) && isComplex(strPrefix))
+        return true;
+    else
+        return false;
+}
+
+/* a^(a+b^(c)) */
+bool Cell::isSimplePrefixWithComplexExponent(std::string str)
+{
+    std::string strPrefix = getExponentPrefix();
+    std::string strExponent = getExponent();
+
+    if (strPrefix.empty() || strExponent.empty())
+        return false;
+
+    if (isSimple(strPrefix) && isComplex(strExponent))
+        return true;
+    else
+        return false;
+}
+
+/* (a+b^(c))^(a+b^(c)) */
+bool Cell::isComplexPrefixWithComplexExponent(std::string str)
+{
+    std::string strPrefix = getExponentPrefix();
+    std::string strExponent = getExponent();
+
+    if (strPrefix.empty() || strExponent.empty())
+        return false;
+
+    if (isComplex(strPrefix) && isComplex(strExponent))
+        return true;
+    else
+        return false;
+}
+
+
+bool Cell::isComplex(std::string str)
+{
+    bool iFlagComplex = false;
+    int iPos;
+
+    iPos = str.find("+");
+    if (iPos > 0)
+        iFlagComplex = true;
+
+    iPos = str.find("-");
+    if (iPos > 0)
+        iFlagComplex = true;
+
+    iPos = str.find("*");
+    if (iPos > 0)
+        iFlagComplex = true;
+
+    iPos = str.find("/");
+    if (iPos > 0)
+        iFlagComplex = true;
+
+    iPos = str.find("^");
+    if (iPos > 0)
+        iFlagComplex = true;
+
+    return iFlagComplex;
+}
+
+bool Cell::isSimple(std::string str)
+{
+    bool iFlagSimple = false;
+
+    if (isNumber(str))
+        iFlagSimple = true;
+    else if (isDecimals(str))
+        iFlagSimple = true;
+    else if (isAlpha(str))
+        iFlagSimple = true;
+    else if (isExp(str))
+        iFlagSimple = true;
+    else if (isPI(str))
+        iFlagSimple = true;
+    else if (isNumberMixAlphaSubscript(str))
+        iFlagSimple = true;
+    else if (isNumberMixEXPSubscript(str))
+        iFlagSimple = true;
+    else if (isNumberMixPISubscript(str))
+        iFlagSimple = true;
+    else
+        iFlagSimple = false;
+
+    return iFlagSimple;
+}
+
 
 
 /* a^(12) or a^(1/2) */
@@ -464,7 +582,51 @@ void Cell::mergeExponent(void)
 
     merge.mergeItem();
 
-    setExponent(itemList.mExpressionStr.substr(1));
+    if (itemList.mExpressionStr.empty()) {
+        setExponent("0");
+    } else {
+        setExponent(itemList.mExpressionStr.substr(1));
+    }
+
+
+}
+
+
+void Cell::calExponent(void)
+{
+    std::string strExponent = getExponent();
+    std::string strExponentPrefix = getExponentPrefix();
+    std::stringstream streamExponent;
+    std::stringstream streamExponentPrefix;
+    std::stringstream streamSum;
+    int iExponent;
+    int iExponentPrefix;
+    double dwSum;
+
+    if (strExponent.empty() || strExponentPrefix.empty())
+        return;
+
+    if (strExponent == "0" || strExponentPrefix == "1") {
+        mStrCell = "1";
+        return;
+    }
+
+
+    if (isNumber(strExponent) && isNumber(strExponentPrefix)) {
+        streamExponent << strExponent;
+        streamExponentPrefix << strExponentPrefix;
+
+        streamExponent >> iExponent;
+        streamExponentPrefix >> iExponentPrefix;
+
+        if (iExponent < 0)
+            return;
+
+        dwSum = pow(iExponentPrefix, iExponent);
+        streamSum << dwSum;
+        streamSum >> mStrCell;
+    }
+
 }
 
 

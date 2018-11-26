@@ -48,6 +48,7 @@ public:
     void exponentUnfold(void);
     void exponentFold(void);
     void mergeAllExponent(void);
+    void calAllExponent(void);
 
     void digitalMerge(void);
 

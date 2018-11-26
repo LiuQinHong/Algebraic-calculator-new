@@ -226,8 +226,6 @@ void Item::exponentFold(void)
     std::string targetTmpStr;
     std::string curStr;
     std::string tmpStr;
-    std::string countStr;
-    std::stringstream stream;
 
     tmpStr = mStrItem.at(0);
 
@@ -318,6 +316,13 @@ void Item::mergeAllExponent(void)
     updateFromAllCell();
 }
 
+void Item::calAllExponent(void)
+{
+    for(std::list<Cell*>::iterator celllist_iter = mCellList.begin(); celllist_iter!= mCellList.end(); ++celllist_iter) {
+        (*celllist_iter)->calExponent();
+    }
+    updateFromAllCell();
+}
 
 /* 8*9*b*h ---> 72*b*h */
 void Item::digitalMerge(void)
@@ -359,6 +364,7 @@ void Item::updateFromAllCell(void)
     tmpStr = mStrItem.at(0);
 
     for(std::list<Cell*>::iterator celllist_iter = mCellList.begin(); celllist_iter!= mCellList.end(); ++celllist_iter) {
+        (*celllist_iter)->updateCellType();
         tmpStr += (*celllist_iter)->mStrCell;
         tmpStr += "*";
     }
