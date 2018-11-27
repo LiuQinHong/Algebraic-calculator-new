@@ -3,6 +3,7 @@
 #include <itemlist.h>
 #include <merge.h>
 #include <cmath>
+#include <qdebug.h>
 
 /* cell类实现方法 */
 
@@ -229,7 +230,6 @@ bool Cell::isNumberMixPISubscript(std::string str)
 bool Cell::isNumberWithExponent(std::string str)
 {
     int iPos;
-
     iPos = str.find('^', 0);
     if (iPos < 0)
         return false;
@@ -244,6 +244,9 @@ bool Cell::isAlphaWithExponent(std::string str)
 {
     std::string strExponent = getExponent();
     int iPos;
+
+    if (strExponent.empty())
+        return false;
 
     if (!isalpha(str.at(0)))
         return false;
@@ -266,7 +269,6 @@ bool Cell::isAlphaWithExponent(std::string str)
 bool Cell::isExpWithExponent(std::string str)
 {
     int iPos;
-
     iPos = str.find('^', 0);
     if (iPos < 0)
         return false;
@@ -288,7 +290,6 @@ bool Cell::isExpWithExponent(std::string str)
 bool Cell::isPIwithExponent(std::string str)
 {
     int iPos;
-
     iPos = str.find('^', 0);
     if (iPos < 0)
         return false;
@@ -309,7 +310,6 @@ bool Cell::isPIwithExponent(std::string str)
 bool Cell::isNumberMixAlphaSubscriptWithExponent(std::string str)
 {
     int iPos;
-
     iPos = str.find('^', 0);
     if (iPos < 0)
         return false;
@@ -328,7 +328,6 @@ bool Cell::isNumberMixAlphaSubscriptWithExponent(std::string str)
 bool Cell::isNumberMixEXPSubscriptWithExponent(std::string str)
 {
     int iPos;
-
     iPos = str.find('^', 0);
     if (iPos < 0)
         return false;
@@ -348,7 +347,6 @@ bool Cell::isNumberMixEXPSubscriptWithExponent(std::string str)
 bool Cell::isNumberMixPISubscriptWithExponent(std::string str)
 {
     int iPos;
-
     iPos = str.find('^', 0);
     if (iPos < 0)
         return false;
@@ -373,7 +371,7 @@ bool Cell::isComplexPrefixWithSimpleExponent(std::string str)
         return false;
 
 
-    if (isSimple(strExponent) && isComplex(strPrefix))
+    if (isSimple(strExponent) && !isSimple(strPrefix))
         return true;
     else
         return false;
@@ -388,7 +386,7 @@ bool Cell::isSimplePrefixWithComplexExponent(std::string str)
     if (strPrefix.empty() || strExponent.empty())
         return false;
 
-    if (isSimple(strPrefix) && isComplex(strExponent))
+    if (isSimple(strPrefix) && !isSimple(strExponent))
         return true;
     else
         return false;
@@ -403,7 +401,7 @@ bool Cell::isComplexPrefixWithComplexExponent(std::string str)
     if (strPrefix.empty() || strExponent.empty())
         return false;
 
-    if (isComplex(strPrefix) && isComplex(strExponent))
+    if (!isSimple(strPrefix) && !isSimple(strExponent))
         return true;
     else
         return false;
@@ -414,6 +412,10 @@ bool Cell::isComplex(std::string str)
 {
     bool iFlagComplex = false;
     int iPos;
+
+    if (str.empty())
+        return false;
+
 
     iPos = str.find("+");
     if (iPos > 0)
@@ -442,6 +444,10 @@ bool Cell::isSimple(std::string str)
 {
     bool iFlagSimple = false;
 
+
+    if (str.empty())
+        return false;
+
     if (isNumber(str))
         iFlagSimple = true;
     else if (isDecimals(str))
@@ -466,13 +472,14 @@ bool Cell::isSimple(std::string str)
 
 
 
-/* a^(12) or a^(1/2) */
+/* a^(12) or a^(1/2) (a^2 + b) */
 std::string Cell::getExponent()
 {
     std::string subStr;
     int iPosLeft = 0;
     int iPosRight = 0;
     int iFlag = 0;
+    int boolFlag = false;
 
     int iPos = mStrCell.find('^', 0);
     if (iPos < 0)
@@ -496,14 +503,21 @@ std::string Cell::getExponent()
                 iFlag--;
 
             if (mStrCell.at(i) == '^') {
-                if (iFlag == 0)
+                if (iFlag == 0) {
+                    boolFlag = true;
                     break;
-            }
+                }
 
+            }
         }
-        subStr = mStrCell.substr(iPosRight - iPosLeft + 2);
-        subStr.pop_back();
-        return subStr;
+
+        if (boolFlag) {
+            subStr = mStrCell.substr(iPosRight - iPosLeft + 2);
+            subStr.pop_back();
+            return subStr;
+        }
+        else
+            return "\0";
     }
 }
 
@@ -537,6 +551,7 @@ std::string Cell::getExponentPrefix()
     int iPosLeft = 0;
     int iPosRight = 0;
     int iFlag = 0;
+    int boolFlag = false;
 
     int iPos = mStrCell.find('^', 0);
     if (iPos < 0)
@@ -558,13 +573,19 @@ std::string Cell::getExponentPrefix()
                 iFlag--;
 
             if (mStrCell.at(i) == '^') {
-                if (iFlag == 0)
+                if (iFlag == 0) {
+                    boolFlag = true;
                     break;
+                }
             }
-
         }
-        subStr = mStrCell.substr(iPosLeft, iPosRight - iPosLeft);
-        return subStr;
+
+        if (boolFlag) {
+            subStr = mStrCell.substr(iPosLeft, iPosRight - iPosLeft);
+            return subStr;
+        }
+        else
+            return "\0";
     }
 
 }

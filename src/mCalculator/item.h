@@ -29,6 +29,7 @@ public:
 
     /* 目前只实现一种赋值方法,有需要可以加实现方法 */
     Item(){};
+    ~Item(){};
     Item(const std::string& strItem);
     Item(const std::string& strItem, enum ItemType type):mStrItem(strItem),mType(type){}
 

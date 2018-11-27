@@ -15,7 +15,10 @@ public:
     std::string mExpressionStr;
 
     ItemList(){}
+    ~ItemList(){delAllItem();}
     ItemList(const std::string &str);
+
+    void setExpressionStr(const std::string &str);
 
     void addItem(Item* item);
     void delItem(Item* item);
@@ -31,6 +34,11 @@ public:
 
     void allExponentUnFold(void);
     void allExponentFold(void);
+
+    static ItemList *calComplexPrefixWithNumberExponent(std::string expressionStr);
+    static ItemList *fraction(ItemList *den, ItemList *mole);
+
+    std::string getCommonFactor();
 };
 
 #endif // ITEMLIST_H

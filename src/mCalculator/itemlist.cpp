@@ -1,5 +1,8 @@
 #include <itemlist.h>
 #include <qdebug.h>
+#include <merge.h>
+#include <separation.h>
+
 
 ItemList::ItemList(const std::string &str)
     :mExpressionStr(str)
@@ -11,6 +14,62 @@ ItemList::ItemList(const std::string &str)
 
     if (str.empty())
         return;
+
+    /* 去掉空格 */
+    deleteAllMark(mExpressionStr, " ");
+    deleteAllMark(mExpressionStr, "\t");
+    deleteAllMark(mExpressionStr, "\r");
+    deleteAllMark(mExpressionStr, "\n");
+
+    if ((mExpressionStr.at(0) != '+') &&  mExpressionStr.at(0) != '-') {
+        mExpressionStr = '+' + mExpressionStr;
+    }
+
+    /* a*(a^2 + b)^(a+b^3)*b^a+a*b*pi[0] + exp[0]^(a+b^3) */
+    for (size_t i = 1; i < mExpressionStr.size(); i++) {
+        if (mExpressionStr.at(i) == '(') {
+            iFlag++;
+            continue;
+        }
+
+
+        if (mExpressionStr.at(i) == ')') {
+            iFlag--;
+            continue;
+        }
+
+
+        if ((iFlag == 0) && ((mExpressionStr.at(i) == '+') || (mExpressionStr.at(i) == '-'))) {
+            iPosEnd = i;
+            subStr = mExpressionStr.substr(iPosStart, iPosEnd - iPosStart);
+            Item *item = new Item(subStr);
+            addItem(item);
+            iPosStart = iPosEnd;
+            continue;
+        }
+    }
+    subStr = mExpressionStr.substr(iPosStart);
+    Item *item = new Item(subStr);
+    addItem(item);
+
+    /* cell 模块种可能会添加括号，所以需要更新信息 */
+    updateFromAllItem();
+}
+
+void ItemList::setExpressionStr(const std::string &str)
+{
+    std::string subStr;
+    int iPosStart = 0;
+    int iPosEnd = 0;
+    int iFlag = 0;
+
+    if (str.empty())
+        return;
+
+    if (!mExpressionStr.empty())
+        delAllItem();
+
+    mExpressionStr = str;
 
     /* 去掉空格 */
     deleteAllMark(mExpressionStr, " ");
@@ -183,5 +242,53 @@ void ItemList::allExponentFold(void)
 
     updateFromAllItem();
 }
+
+
+ItemList *ItemList::calComplexPrefixWithNumberExponent(std::string expressionStr)
+{
+    QString den;
+    QString mole;
+    ItemList *itemListOrg = new ItemList(expressionStr);
+
+    itemListOrg->allExponentUnFold();
+
+    Separation(itemListOrg->mExpressionStr.c_str()+1, den, mole);
+    delete itemListOrg;
+
+    ItemList *itemListRet = new ItemList(mole.toStdString());
+    itemListRet->allExponentFold();
+
+    Merge merge(itemListRet);
+    merge.mergeItem();
+
+    return itemListRet;
+
+}
+
+std::string ItemList::getCommonFactor()
+{
+    std::list<Item*> targetItemList;
+    std::list<Cell*> commonFactorCellList;
+
+    while (mItemList.size()) {
+        Item *item = mItemList.front();
+        mItemList.pop_front();
+
+
+
+    }
+}
+
+
+/* den : +a*b*c*exp + a*(exp^a+b)^(c+d)*exp*b */
+/* mole : -a*d*b*exp + a*(a + exp^b)^(c+d)*b*exp */
+ItemList *ItemList::fraction(ItemList *den, ItemList *mole)
+{
+
+}
+
+
+
+
 
 

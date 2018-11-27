@@ -10,19 +10,15 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     mCalculator w;
-    //w.show();
-    //ItemList *itemList = new ItemList("(exp^a*exp^a*exp^a*exp^a+pi[0]^b*pi[0]^b)^(exp^a*exp^a*exp^a*exp^a+pi[0]^b*pi[0]^b) * (exp^a*exp^a*exp^a*exp^a+pi[0]^b*pi[0]^b)^(exp^a*exp^a*exp^a*exp^a+pi[0]^b*pi[0]^b)");
-    //ItemList *itemList = new ItemList("a^a*a^a*a^a");
-    //ItemList *itemList = new ItemList("2^a*1*a*exp^a*a*exp^a*a*exp^a +  exp[0]^a*pi^a*pi*exp[0]^2*exp[0]^(a^a*b)*pi^(a*b)*exp[0]*exp[0]*exp[0]*exp[0]+(a+b)^(a*b)*(b+a)^(a)+2^2*2^2*2^2*2^2*3^2*1^3*1^(a+b+c*d)*1*1*1");
-    //ItemList *itemList = new ItemList("(a+b^a)^(-a*b)*(b^a+a)^(a*b)");
-    ItemList *itemList = new ItemList("+1*a*exp*pi*a[0]*exp[0]*pi[0]*2^a*a^2*exp^2*pi^2*(a+b^(c))^a*a^(a+b^(c))*(a+b^(c))^(a+b^(c))*a[0]^2*exp[0]^2*pi[0]^2");
-    itemList->printAllItem();
-    //itemList->allExponentFold();
+    //ItemList *itemList = ItemList::calComplexPrefixWithNumberExponent("(a+b)^2 + (exp^(2)+a)^2");
+
+    //ItemList *itemList = new ItemList("+2*a^(2)+2*a*exp^(2)+exp^(4)+b^(2)+2*b*a");
     //itemList->printAllItem();
 
-    //Merge merge(itemList);
+    ItemList itemList;
+    itemList.setExpressionStr("+2*a^(2)+2*a*exp^(2)+exp^(4)+b^(2)+2*b*a");
+    itemList.printAllItem();
 
-    //merge.mergeItem();
-    //itemList->printAllItem();
+    //delete itemList;
     return 0;
 }

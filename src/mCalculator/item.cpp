@@ -95,6 +95,7 @@ void Item::parseItemToCell(std::string& strItem)
     int iPosEnd = 0;
     std::string tmpStr = strItem;
 
+
     if ((strItem.at(0) == '+') || strItem.at(0) == '-')
         tmpStr = strItem.substr(1);
 
@@ -116,6 +117,7 @@ void Item::parseItemToCell(std::string& strItem)
         if (tmpStr.at(i) == '*' && iFlag == 0) {
             iPosEnd = i;
             std::string subStr = tmpStr.substr(iPosStart, iPosEnd - iPosStart);
+
             Cell *cell = new Cell(subStr);
             addCell(cell);
             iPosStart = iPosEnd + 1;
@@ -124,7 +126,6 @@ void Item::parseItemToCell(std::string& strItem)
 
 
     }
-
 
     std::string subStr = tmpStr.substr(iPosStart);
 
@@ -174,24 +175,25 @@ void Item::parseCelltoItem()
 /* exp[123]^(3)*pi[123]^(2)*a^(2)*2^(3) */
 void Item::exponentUnfold(void)
 {
+    std::string exponentStr;
+    std::string prefixStr;
     std::string tmpStr;
-    std::string subStr;
     int iCount = 0;
 
 
     tmpStr = mStrItem.at(0);
 
     for(std::list<Cell*>::iterator celllist_iter = mCellList.begin(); celllist_iter!= mCellList.end(); ++celllist_iter) {
-        int iPos = (*celllist_iter)->mStrCell.find("^");
-        if (iPos < 0) {
-            tmpStr += (*celllist_iter)->mStrCell;
-            tmpStr += "*";
+
+        exponentStr = (*celllist_iter)->getExponent();
+        if (exponentStr.empty())
             continue;
-        }
 
+        prefixStr = (*celllist_iter)->getExponentPrefix();
+        if (prefixStr.empty())
+            continue;
 
-        subStr = (*celllist_iter)->mStrCell.substr(0, iPos);
-        if (!(*celllist_iter)->isNumber((*celllist_iter)->getExponent())) {
+        if (!(*celllist_iter)->isNumber(exponentStr)) {
             tmpStr += (*celllist_iter)->mStrCell;
             tmpStr += "*";
             continue;
@@ -202,7 +204,7 @@ void Item::exponentUnfold(void)
         stream >> iCount;
 
         for (int i = 0; i < iCount; i++) {
-            tmpStr += subStr;
+            tmpStr += prefixStr;
             tmpStr += "*";
         }
     }
