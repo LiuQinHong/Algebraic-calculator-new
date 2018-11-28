@@ -372,6 +372,7 @@ void Transform::transformItem(Item &item)
         case EXPWITHEXPONENT:
         case ALPHAWITHEXPONENT:
         case NUMBERWITHEXPONENT:
+        case SIMPLEPREFIXWITHCOMPLEXEXPONENT:
             if(denominatorFlag)
                 toUnderSuper(*(*cellList_iter));
             else
