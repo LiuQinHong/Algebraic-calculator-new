@@ -243,7 +243,7 @@ void Transform::toUnderSubsuper(Cell &cell)
     }
 }
 
-bool Transform::toComplexList(Cell &cell)
+bool Transform::toComplexListUnder(Cell &cell)
 {
     bool res = true;
     std::string str;
@@ -273,6 +273,33 @@ bool Transform::toComplexList(Cell &cell)
     *outHtml += spanMid;
     *outHtml += ")";
     *outHtml += spanEnd;
+    //qDebug() << "cell = " << cell.mStrCell.c_str() << "cell type = " << cell.mCellType;
+
+    return res;
+}
+
+bool Transform::toComplexList(Cell &cell)
+{
+    bool res = true;
+    std::string str;
+    if((cell.mCellType == COMPLEXPREFIXWITHSIMPLEEXPONENT) || (cell.mCellType == COMPLEXPREFIXWITHCOMPLEXEXPONENT)){
+        str = cell.getExponentPrefix();
+        str.erase(0,1);
+        qDebug() << "str = " << str.c_str();
+        str.pop_back();
+       }
+    else if(cell.mCellType == COMPLEXEXPRESSION){
+        str =  cell.mStrCell;
+        str.erase(0,1);
+        str.pop_back();
+        qDebug() << "str = " << str.c_str();
+    }
+
+    ItemList complexList(str);
+    //complexList.printAllItem();
+    *outHtml += "(";
+    res = transforms(complexList);
+    *outHtml += ")";
     //qDebug() << "cell = " << cell.mStrCell.c_str() << "cell type = " << cell.mCellType;
 
     return res;
@@ -409,7 +436,10 @@ void Transform::transformItem(Item &item)
         case COMPLEXEXPRESSION:
         case COMPLEXPREFIXWITHSIMPLEEXPONENT:
         case COMPLEXPREFIXWITHCOMPLEXEXPONENT:
-            toComplexList(*(*cellList_iter));
+            if(denominatorFlag)
+                toComplexListUnder(*(*cellList_iter));
+            else
+                toComplexList(*(*cellList_iter));
             if(denominatorFlag)
                 toComplexListUnderSuper(*(*cellList_iter));
             else

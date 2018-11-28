@@ -33,7 +33,7 @@ mCalculator::mCalculator(QWidget *parent) :
     QString den;
     QString mole;
 
-    Separation("exp+exp",den, mole);
+    Separation("(exp*b+a+exp*b+pi*b+pi^2*b+a)/(exp*b+pi*b+pi^2*b)+(exp*b+a+exp*b)",den, mole);
 
     qDebug() << "den = "<< den;
     qDebug() << "mole = "<< mole;
@@ -57,16 +57,21 @@ mCalculator::mCalculator(QWidget *parent) :
     qDebug() << "itemListDen = "<< itemListDen->mExpressionStr.c_str();
     qDebug() << "itemListMole = "<< itemListMole->mExpressionStr.c_str();
 
+    //ItemList test("exp*b+a+exp*b+pi*b+pi^2*b+a+b+b+c+c+exp+exp+c+c+pi");
+
     Merge merge(itemListMole);
     merge.makeItem(itemListMole);
 
+    Merge merge1(itemListDen);
+    merge1.makeItem(itemListDen);
 
-    itemListMole->printAllItem();
+
+    //itemListMole->printAllItem();
 
     /*ItemList *test = new ItemList("b^(c+d)+(a+b)^(a+b)");
     test->printAllItem();*/
 
-    Transform tt(*itemListMole,true);
+    Transform tt(*itemListDen,true);
     tt.transform();
     Transform tt1(*itemListMole,false);
     tt1.transform();

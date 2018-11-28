@@ -49,6 +49,8 @@ public:
 
     bool toComplexList(Cell &cell);
 
+    bool toComplexListUnder(Cell &cell);
+
     void toComplexListSuper(Cell &cell);
 
     void toComplexListUnderSuper(Cell &cell);

@@ -38,11 +38,13 @@ int Merge::mergeItem()
 
             if(nextList_iter == itemListTemp_i->mItemList.end())//防止溢出
                 --nextList_iter;
-            coefFlag = 0;
+            //coefFlag = 0;
             flag = false;
         }
+        coefFlag = true;
         if(!coefStr.empty()){
             qDebug() << "Enter coef del";
+            qDebug() << "print coefStr" << coefStr.c_str();
             ItemList coefItemList(coefStr);
             coefItemList.printAllItem();
 
@@ -92,9 +94,10 @@ int Merge::mergeItem()
                 coefItemTemp.append("*");
 
             qDebug() << "coefItemTemp :" << coefItemTemp.c_str();
-            qDebug() << "after coefItem (*itemlist_iter)->mStrItem :" << (*itemlist_iter)->mStrItem.c_str();
 
             (*itemlist_iter)->mStrItem.replace(0,1,coefItemTemp);
+
+            qDebug() << "after coefItem (*itemlist_iter)->mStrItem :" << (*itemlist_iter)->mStrItem.c_str();
 
             (*itemlist_iter)->delAllCell();
 
@@ -160,7 +163,7 @@ int Merge::judgeItems(Item& origItem, Item& newItem,ItemList* itemList,std::list
         //重构cell链表
         origItem.delAllCell();
         origItem.parseItemToCell(origItem.mStrItem);
-        if(*iter)
+        if(iter != itemList->mItemList.end())
             itemList->mItemList.erase(iter++);
         //递归判断下一项是否和origItem相同,处理接连3项或者以上为同一类型情况
         if(iter != itemList->mItemList.end())
@@ -183,12 +186,14 @@ int Merge::judgeItems(Item& origItem, Item& newItem,ItemList* itemList,std::list
             restoreCellLsist(origItem,cofStr);
         }
         else {
+            qDebug() << "extractItemcoefAll origItem1 = " << origItem.mStrItem.c_str();
+            qDebug() << "extractItemcoefAll newItem1 = " << newItem.mStrItem.c_str();
             extractItemcoefAll(origItem,newItem);
         }
 
         qDebug() << "iter = " << *iter;
 
-        if(*iter)
+        if(iter != itemList->mItemList.end())
             itemList->mItemList.erase(iter++);
 
         qDebug() << "iter after erase = " << *iter;
@@ -220,12 +225,14 @@ int Merge::judgeItem(Item& origItem, Item& newItem,bool t)
     qDebug() << "newtemTemp = " << newtemTemp.mStrItem.c_str() << " : mType = " << newtemTemp.mType;
     qDebug() << "t = " << t;
     if((origitemTemp.mType == newtemTemp.mType) && (origitemTemp.mType == SIMPLENUMBER)){
+        qDebug() << "Enter JudgeItem NUMBERFLAG";
         return NUMBERFLAG;
     }
     else if((origitemTemp.mType == SIMPLENUMBER) || (newtemTemp.mType == SIMPLENUMBER)){
         return -1;
     }
     else {
+        qDebug() << "Enter JudgeItem else";
         if(!t)
             extractItemcoeff(origitemTemp,newtemTemp);//排序前去掉系数,否则会影响判断
         else
@@ -262,10 +269,12 @@ int Merge::judgeItem(Item& origItem, Item& newItem,bool t)
 void Merge::extractItemcoefAll(Item &origItem,Item &nextItem)
 {
     bool coefAllFlag = false;
+    qDebug() << "coefStr = " << coefStr.c_str();
     if(coefFlag){
+        qDebug() << " Enter coefFlag " ;
         //遍历Cell链表提取系数
         for(std::list<Cell*>::iterator origList_iter = origItem.mCellList.begin();
-            origList_iter!= origItem.mCellList.end();){
+            origList_iter!= origItem.mCellList.end();++origList_iter){
             if((*origList_iter)->mCellType == NUMBER || (*origList_iter)->mCellType == EXP ||
                (*origList_iter)->mCellType == PI	|| (*origList_iter)->mCellType == EXPWITHEXPONENT ||
                (*origList_iter)->mCellType == PIWITHEXPONENT){
@@ -277,49 +286,43 @@ void Merge::extractItemcoefAll(Item &origItem,Item &nextItem)
                     ++origList_iter;
                 coefAllFlag = true;
             }
-            else
-                ++origList_iter;
-
         }
         if(!coefStr.empty())
             coefStr.pop_back();
+        origItem.updateFromAllCell();
     }
-    coefFlag = false;
-    origItem.updateFromAllCell();
+
+
     qDebug() << "updateFromAllCell " << origItem.mStrItem.c_str();
-    qDebug() << "nextItem.mStrItem.at(0) " << nextItem.mStrItem.c_str();
-    if(coefAllFlag){
-        if(nextItem.mStrItem.at(0) == '+'){
-            qDebug() << "nextItem.mStrItem.at(0) " << nextItem.mStrItem.c_str();
-            coefStr.append("+");
-            qDebug() << "nextItem.mStrItem.at(0) " << nextItem.mStrItem.c_str();
-        }
-        else
-            coefStr.append("-");
-    }
-    else{
+    qDebug() << "nextItem.mStrItem1 " << nextItem.mStrItem.c_str();
+    if(!coefAllFlag && coefFlag){
         if(origItem.mStrItem.at(0) == '+')
             coefStr = "+1";
         else
             coefStr = "-1";
     }
+    if(nextItem.mStrItem.at(0) == '+'){
+        coefStr.append("+");
+    }
+    else
+        coefStr.append("-");
+
     coefAllFlag = false;
-    qDebug() << "nextItem.mStrItem.at(0) ";
+    coefFlag = false;
+    qDebug() << "after orig coefStr " << coefStr.c_str();
     for(std::list<Cell*>::iterator nextList_iter = nextItem.mCellList.begin();
-        nextList_iter!= nextItem.mCellList.end();){
+        nextList_iter!= nextItem.mCellList.end();++nextList_iter){
         if((*nextList_iter)->mCellType == NUMBER || (*nextList_iter)->mCellType == EXP ||
            (*nextList_iter)->mCellType == PI	|| (*nextList_iter)->mCellType == EXPWITHEXPONENT ||
            (*nextList_iter)->mCellType == PIWITHEXPONENT){
             coefStr.append((*nextList_iter)->mStrCell);
             coefStr.append("*");
-            if(nextList_iter != nextItem.mCellList.end())
-                origItem.mCellList.erase(nextList_iter++);
+            /*if(nextList_iter != nextItem.mCellList.end())
+                nextItem.mCellList.erase(nextList_iter++);
             else
-                ++nextList_iter;
+                ++nextList_iter;*/
             coefAllFlag = true;
         }
-        else
-            ++nextList_iter;
     }
     nextItem.updateFromAllCell();
     qDebug() << "after parseCelltoItem and delcoef nextItem = " << nextItem.mStrItem.c_str();
@@ -329,9 +332,9 @@ void Merge::extractItemcoefAll(Item &origItem,Item &nextItem)
     }
     else{
         if(nextItem.mStrItem.at(0) == '+')
-            coefStr += "+1";
+            coefStr += "1";
         else
-            coefStr += "-1";
+            coefStr += "1";
     }
 
 
@@ -450,7 +453,11 @@ double Merge::extractItemcoeff(Item &origItem, Item &nextItem)
     //origItem.parseCelltoItem();
     qDebug() << "origItem = " << origItem.mStrItem.c_str();
     //origItem.printAllCell();
-    origItem.updateFromAllCell();
+    qDebug() << "origItem.mCellList.size( = " << origItem.mCellList.size();
+    if(origItem.mCellList.size())
+        origItem.updateFromAllCell();
+    else
+        origItem.mStrItem.clear();
     qDebug() << "origItem = " << origItem.mStrItem.c_str();
     for(std::list<Cell*>::iterator nextList_iter = nextItem.mCellList.begin();
         nextList_iter!= nextItem.mCellList.end();){
@@ -469,7 +476,10 @@ double Merge::extractItemcoeff(Item &origItem, Item &nextItem)
     qDebug() << "nextItem = " << nextItem.mStrItem.c_str();
     //nextItem.parseCelltoItem();
     //nextItem.printAllCell();
-    nextItem.updateFromAllCell();
+    if(nextItem.mCellList.size())
+        nextItem.updateFromAllCell();
+    else
+        nextItem.mStrItem.clear();
     qDebug() << "nextItem = " << nextItem.mStrItem.c_str();
     qDebug() << "exit coeff";
 }
