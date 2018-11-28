@@ -12,6 +12,7 @@
   </property>
   <property name="font">
    <font>
+    <family>Serif</family>
     <pointsize>26</pointsize>
    </font>
   </property>

@@ -1,6 +1,7 @@
 #include "mcalculator.h"
 #include "ui_mcalculator.h"
 #include <transform.h>
+#include <merge.h>
 
 mCalculator::mCalculator(QWidget *parent) :
     QWidget(parent),
@@ -26,7 +27,10 @@ mCalculator::mCalculator(QWidget *parent) :
 
     ui->textEdit_display->setText("<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">(a+b)<span style=\" vertical-align:super;\">(a+b)</span></p>");
 
-    ItemList test("132+a*(a^2 + b)^(a+b^3)*b^a+a*b*pi + exp^(a+b^3) + a*b*c+a^(1/2)");
+    ItemList test("111+222+b*c*d+a^b+b^a-2*a*b*pi-3*a*b*pi+3*a*b*exp+(a[1]+b[1]^3)^2+(a+b^3)^(a[1]+b)");
+    test.printAllItem();
+    Merge merge(&test);
+    merge.mergeItem();
     test.printAllItem();
     Transform tt(test,true);
     tt.transform();

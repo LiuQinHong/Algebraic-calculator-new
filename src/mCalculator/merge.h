@@ -16,6 +16,8 @@ enum ItemFlag {
 class Merge{
  private:
    ItemList* mgeitemList;
+   bool coefFlag;
+   std::string coefStr;
 
  public:
 
@@ -27,13 +29,17 @@ class Merge{
 
     int mergeItem();
 
-    int judgeItem(Item& origItem, Item& newItem);
+    int judgeItem(Item& origItem, Item& newItem,bool t = false);
 
-    int judgeItems(Item& origItem, Item& newItem,ItemList* itemList,std::list<Item*>::iterator& iter);
+    int judgeItems(Item& origItem, Item& newItem,ItemList* itemList,std::list<Item*>::iterator& iter,bool t = false);
 
-    double extractItemcoef(Item& origItem,Item& nextItem);
+    void extractItemcoefAll(Item& origItem,Item& nextItem);
+
+    double calculateCoef(Item &origItem,Item &nextItem);
 
     double extractItemcoeff(Item& origItem,Item& nextItem);
+
+    double extractItemcoef(Item& origItem,Item& nextItem);
 
     void makeItem(ItemList* itemList);
 

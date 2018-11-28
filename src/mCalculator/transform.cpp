@@ -16,37 +16,6 @@ Transform::~Transform()
     delete outHtml;
 }
 
-/*
- * @original: 要转换的字符串
- * @outHtml : 转换成Html风格的字符串
-*/
-bool Transform::transform()
-{
-    bool res;
-    *outHtml += pStart;
-    res = transforms(transItemList);
-    *outHtml += pEnd;
-    return res;
-}
-
-bool Transform::transforms(ItemList &itemList)
-{
-    int i = 0;
-    for(std::list<Item*>::iterator itemList_iter = itemList.mItemList.begin();
-        itemList_iter!= itemList.mItemList.end(); ++itemList_iter){
-        qDebug() << "tranfrom start!";
-        if(i != 0)
-            toSymbol(*(*itemList_iter));
-
-        transformItem(*(*itemList_iter));
-
-        i++;
-    }
-
-    qDebug() << "tranfrom over!";
-    return true;
-}
-
 void Transform::toSymbol(Item &item)
 {
     if(denominatorFlag){
@@ -62,10 +31,12 @@ void Transform::toSymbol(Item &item)
 
 void Transform::toNormal(Cell &cell)
 {
-    if(cell.mCellType != PI)
-        *outHtml += cell.mStrCell;
-    else
+    if(cell.mCellType == PI)
         *outHtml += "π";
+    else if(cell.mCellType == EXP)
+        *outHtml += "e";
+    else
+        *outHtml += cell.mStrCell;
 }
 
 void Transform::toUnderNormal(Cell &cell)
@@ -74,12 +45,12 @@ void Transform::toUnderNormal(Cell &cell)
     *outHtml += spanStart;
     *outHtml += underLine;
     *outHtml += spanMid;
-    if(cell.mCellType != PI)
-        *outHtml += cell.mStrCell;
+    if(cell.mCellType == PI)
+        *outHtml += "π";
     else if(cell.mCellType == EXP)
         *outHtml += "e";
     else
-        *outHtml += "π";
+        *outHtml += cell.mStrCell;
     *outHtml += spanEnd;
 }
 
@@ -99,7 +70,14 @@ void Transform::toSuper(Cell &cell)
         *outHtml += spanStart;
         *outHtml += super;
         *outHtml += spanMid;
-        *outHtml += cell.getExponent();//幂
+        if(cell.getExponent().length() > 1 && (cell.getExponent().find('+') || cell.getExponent().find('-'))){
+            std::string str = cell.getExponent();
+            str.insert(0,"(");
+            str.insert(str.length()-1,")");
+            *outHtml += str;//幂
+        }
+        else
+         *outHtml += cell.getExponent();//幂
         *outHtml += spanEnd;
     }
 
@@ -126,7 +104,14 @@ void Transform::toUnderSuper(Cell &cell)
         *outHtml += super;
         *outHtml += underLine;
         *outHtml += spanMid;
-        *outHtml += cell.getExponent();//幂
+        if(cell.getExponent().length() > 1 && (cell.getExponent().find('+') || cell.getExponent().find('-'))){
+            std::string str = cell.getExponent();
+            str.insert(0,"(");
+            str.insert(str.length()-1,")");
+            *outHtml += str;//幂
+        }
+        else
+         *outHtml += cell.getExponent();//幂
         *outHtml += spanEnd;
      }
 }
@@ -244,10 +229,23 @@ void Transform::toUnderSubsuper(Cell &cell)
 
 bool Transform::toComplexList(Cell &cell)
 {
-    bool res;
-    std::string str = cell.getExponentPrefix().erase(0,1);
-    str.erase(str.length()-1,str.length());
+    bool res = true;
+    std::string str;
+    if((cell.mCellType == COMPLEXPREFIXWITHSIMPLEEXPONENT) || (cell.mCellType == COMPLEXPREFIXWITHCOMPLEXEXPONENT)){
+        str = cell.getExponentPrefix();
+        str.erase(0,1);
+        qDebug() << "str = " << str.c_str();
+        str.pop_back();
+       }
+    else if(cell.mCellType == COMPLEXEXPRESSION){
+        str =  cell.mStrCell;
+        str.erase(0,1);
+        str.pop_back();
+        qDebug() << "str = " << str.c_str();
+    }
+
     ItemList complexList(str);
+    //complexList.printAllItem();
     *outHtml += spanStart;
     *outHtml += underLine;
     *outHtml += spanMid;
@@ -259,6 +257,7 @@ bool Transform::toComplexList(Cell &cell)
     *outHtml += spanMid;
     *outHtml += ")";
     *outHtml += spanEnd;
+    //qDebug() << "cell = " << cell.mStrCell.c_str() << "cell type = " << cell.mCellType;
 
     return res;
 }
@@ -281,7 +280,8 @@ void Transform::toComplexListSuper(Cell &cell)
 
 void Transform::toComplexListUnderSuper(Cell &cell)
 {
-    if(cell.getExponent() == "1/2"){
+    std::string str = cell.getExponent();
+    if(str == "1/2"){
         *outHtml += spanStart;
         *outHtml += underLine;
         *outHtml += spanMid;
@@ -289,14 +289,55 @@ void Transform::toComplexListUnderSuper(Cell &cell)
         *outHtml += spanEnd;
     }
     //获得幂
-     if(cell.getExponent() != "1/2"){
+     if(str != "1/2"){
         *outHtml += spanStart;
         *outHtml += super;
         *outHtml += underLine;
         *outHtml += spanMid;
-        *outHtml += cell.getExponent();//幂
+         int addFlag = str.find("+");
+         int delFlag = str.find("-");
+         if((addFlag >= 0) || (delFlag >= 0)){
+             str.insert(0,1,'(');
+             str.push_back(')');
+         }
+        *outHtml += str;//幂
         *outHtml += spanEnd;
      }
+}
+
+/*
+ * @original: 要转换的字符串
+ * @outHtml : 转换成Html风格的字符串
+*/
+bool Transform::transform()
+{
+    bool res;
+    *outHtml += pStart;
+    res = transforms(transItemList);
+    *outHtml += pEnd;
+    return res;
+}
+
+bool Transform::transforms(ItemList &itemList)
+{
+    int i = 0;
+    for(std::list<Item*>::iterator itemList_iter = itemList.mItemList.begin();
+        itemList_iter!= itemList.mItemList.end(); ++itemList_iter){
+        qDebug() << "tranfrom start!";
+        if(i != 0)
+            toSymbol(*(*itemList_iter));
+        else{
+            if((*itemList_iter)->mStrItem.at(0) == '-')
+                toSymbol(*(*itemList_iter));
+        }
+
+        transformItem(*(*itemList_iter));
+
+        i++;
+    }
+
+    qDebug() << "tranfrom over!";
+    return true;
 }
 
 void Transform::transformItem(Item &item)
@@ -348,6 +389,9 @@ void Transform::transformItem(Item &item)
 
             break;
         case RESERVE:
+        case COMPLEXEXPRESSION:
+        case COMPLEXPREFIXWITHSIMPLEEXPONENT:
+        case COMPLEXPREFIXWITHCOMPLEXEXPONENT:
             toComplexList(*(*cellList_iter));
             if(denominatorFlag)
                 toComplexListUnderSuper(*(*cellList_iter));
