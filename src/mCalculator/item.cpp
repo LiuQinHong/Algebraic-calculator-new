@@ -98,6 +98,7 @@ void Item::replaceCell(std::string srcCellStr, std::string dstCellStr)
 
 bool Item::isSimpleNumber(std::string str)
 {
+
     for(size_t i = 0;i < str.size(); i++) {
         if ((str.at(i) == '+') || str.at(i) == '-' || str.at(i) == '*' || str.at(i) == '.')
             continue;
@@ -442,6 +443,15 @@ void Item::printAllCell(void)
     }
 }
 
+
+void Item::processAllCellParentheses(void)
+{
+    for(std::list<Cell*>::iterator celllist_iter = mCellList.begin(); celllist_iter!= mCellList.end(); ++celllist_iter) {
+        (*celllist_iter)->processParentheses();
+    }
+
+    updateFromAllCell();
+}
 
 bool Item::operator==(Item& item)
 {

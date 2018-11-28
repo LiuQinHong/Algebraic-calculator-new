@@ -2,6 +2,7 @@
 #include <qdebug.h>
 #include <merge.h>
 #include <separation.h>
+#include <QString>
 
 
 ItemList::ItemList(const std::string &str)
@@ -216,6 +217,15 @@ void ItemList::printAllItem(void)
 }
 
 
+void ItemList::processAllItemParentheses(void)
+{
+    for(std::list<Item*>::iterator itemlist_iter = mItemList.begin(); itemlist_iter!= mItemList.end(); ++itemlist_iter) {
+        (*itemlist_iter)->processAllCellParentheses();
+    }
+
+    updateFromAllItem();
+}
+
 void ItemList::updateFromAllItem(void)
 {
     std::string tmpStr;
@@ -353,7 +363,48 @@ void ItemList::fraction(ItemList *den, ItemList *mole)
     mole->removeCommonFactor(itemList.getCommonFactor());
 }
 
+void ItemList::process(std::string src,ItemList *den, ItemList *mole)
+{
+    QString denStr;
+    QString moleStr;
 
+    if (src.empty())
+        return;
+
+    if (src.at(0) == '+' || src.at(0) == '-')
+        src = src.substr(1);
+
+    Separation(src.c_str() ,denStr, moleStr);
+
+    qDebug() << "denStr = "<< denStr;
+    qDebug() << "moleStr = "<< moleStr;
+
+
+    ItemList *itemListDen = ItemList::calComplexPrefixWithNumberExponent(denStr.toStdString());
+    qDebug() << "itemListDen = "<< itemListDen->mExpressionStr.c_str();
+
+    ItemList *itemListMole = ItemList::calComplexPrefixWithNumberExponent(moleStr.toStdString());
+    qDebug() << "itemListMole = "<< itemListMole->mExpressionStr.c_str();
+
+    itemListDen->allExponentUnFold();
+    itemListMole->allExponentUnFold();
+
+    ItemList::fraction(itemListDen, itemListMole);
+    itemListDen->allExponentFold();
+    itemListMole->allExponentFold();
+
+    qDebug() << "itemListDen = "<< itemListDen->mExpressionStr.c_str();
+    qDebug() << "itemListMole = "<< itemListMole->mExpressionStr.c_str();
+
+    Merge merge(itemListDen);
+    merge.makeItem(itemListDen);
+    merge.makeItem(itemListMole);
+
+    itemListDen->printAllItem();
+    itemListMole->printAllItem();
+    *den = *itemListDen;
+    *mole = *itemListMole;
+}
 
 
 

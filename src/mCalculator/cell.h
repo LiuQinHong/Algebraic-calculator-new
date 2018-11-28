@@ -72,13 +72,15 @@ public:
 
     std::string getExponent();
     void setExponent(std::string strExponent);
+    void setExponentPrefix(std::string strExponentPrefix);
     std::string getSubscript();
     std::string getExponentPrefix();
     void mergeExponent(void);
     void calExponent(void);
 
+    void processParentheses(void);
 
-    void addParentheses();
+    void addParentheses(void);
 
 
     bool operator==(Cell& cell);

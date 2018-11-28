@@ -61,6 +61,8 @@ public:
     void updateFromAllCell(void);
     void printAllCell(void);
 
+    void processAllCellParentheses(void);
+
     bool operator==(Item& item);
 
 };

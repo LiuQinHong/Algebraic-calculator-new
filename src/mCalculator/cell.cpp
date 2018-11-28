@@ -4,6 +4,8 @@
 #include <merge.h>
 #include <cmath>
 #include <qdebug.h>
+#include <algorithm>
+#include <separation.h>
 
 /* cell类实现方法 */
 
@@ -536,6 +538,13 @@ void Cell::setExponent(std::string strExponent)
     mStrCell = getExponentPrefix() + "^(" + strExponent +")";
 }
 
+
+void Cell::setExponentPrefix(std::string strExponentPrefix)
+{
+    mStrCell = "(" + strExponentPrefix + ")" + "^(" + getExponent() + ")";
+}
+
+
 /* a[123] exp[123] pi[123]^(123) */
 std::string Cell::getSubscript()
 {
@@ -658,6 +667,48 @@ void Cell::calExponent(void)
         streamSum >> mStrCell;
     }
 
+}
+
+
+/* (a+b*c^(a+b))^(exp*(a+b)) */
+void Cell::processParentheses(void)
+{
+    std::string strExponent = getExponent();
+    std::string strExponentPrefix = getExponentPrefix();
+
+    if (strExponent.empty() || strExponentPrefix.empty())
+        return;
+
+
+    ItemList itemListDen;
+    ItemList itemListMole;
+    ItemList::process(strExponent, &itemListDen, &itemListMole);
+
+    if (itemListDen.mExpressionStr.substr(1) == "1") {
+        strExponent = itemListMole.mExpressionStr.substr(1);
+    }
+    else {
+        strExponent = itemListMole.mExpressionStr.substr(1) + "/" + itemListDen.mExpressionStr.substr(1);
+    }
+
+    setExponent(strExponent);
+
+
+    if (strExponentPrefix.at(0) == '(' && strExponentPrefix.at(strExponentPrefix.size() - 1) == ')') {
+        strExponentPrefix.pop_back();
+        strExponentPrefix = strExponentPrefix.substr(1);
+    }
+
+    ItemList::process(strExponentPrefix, &itemListDen, &itemListMole);
+
+    if (itemListDen.mExpressionStr.substr(1) == "1") {
+        strExponentPrefix = itemListMole.mExpressionStr.substr(1);
+    }
+    else {
+        strExponentPrefix = itemListMole.mExpressionStr.substr(1) + "/" + itemListDen.mExpressionStr.substr(1); ;
+    }
+
+    setExponentPrefix(strExponentPrefix);
 }
 
 

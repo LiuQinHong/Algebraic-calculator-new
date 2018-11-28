@@ -32,6 +32,7 @@ public:
     void addParentheses(std::string& str);
     void digitalMergeAllItem(void);
     void printAllItem(void);
+    void processAllItemParentheses(void);
     void updateFromAllItem(void);
 
     void allExponentUnFold(void);
@@ -39,6 +40,7 @@ public:
 
     static ItemList *calComplexPrefixWithNumberExponent(std::string expressionStr);
     static void fraction(ItemList *den, ItemList *mole);
+    static void process(std::string src,ItemList *den, ItemList *mole);
 
     std::string getCommonFactor();
     void removeCommonFactor(std::string strCommonFactor);
