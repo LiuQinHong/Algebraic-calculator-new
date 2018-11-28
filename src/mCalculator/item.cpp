@@ -36,7 +36,7 @@ void Item::delCell(Cell* cell)
 void Item::delAllCell()
 {
     for(std::list<Cell*>::iterator celllist_iter = mCellList.begin(); celllist_iter!= mCellList.end(); ++celllist_iter) {
-        delete (*celllist_iter);
+        //delete (*celllist_iter);
     }
     mCellList.clear();
 }

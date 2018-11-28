@@ -10,15 +10,18 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     mCalculator w;
-    //ItemList *itemList = ItemList::calComplexPrefixWithNumberExponent("(a+b)^2 + (exp^(2)+a)^2");
+    //ItemList *itemListLeft = ItemList::calComplexPrefixWithNumberExponent("(a+b)^2 + (exp^(2)+a)^2");
+    //ItemList *itemListRight = ItemList::calComplexPrefixWithNumberExponent("(exp^(2)+a)^2+(b+a)^2");
 
+    ItemList *itemListLeft = new ItemList("+1*a*exp*pi*a[0]*exp[0]*pi[0]*1^a*a^2*exp^2*pi^2*(a+b^(c))^a*a^(a+b^(c))*(a+b^(c))^(a+b^(c))*a[0]^2*exp[0]^2*pi[0]^2");
+    ItemList *itemListRight = new ItemList("-1*a*exp*pi*a[0]*exp[0]*pi[0]*a^(a+b^(c))*(a+b^(c))^(a+b^(c))*a[0]^2*exp[0]^2*pi[0]^2*1^a*a^2*exp^2*pi^2*(a+b^(c))^a");
+    if (*itemListLeft == *itemListRight)
+        qDebug() << "*itemListLeft == *itemListRight";
+    else
+        qDebug() << "*itemListLeft != *itemListRight";
 
-    Item *item = new Item("123");
+    itemListLeft->printAllItem();
+    itemListRight->printAllItem();
 
-    item->delAllCell();
-    item->mStrItem = "(5*pi+3*exp)*a*b";
-
-    item->parseItemToCell(item->mStrItem);
-    qDebug() << "mStrItem = " << item->mStrItem.c_str();
     return 0;
 }

@@ -268,15 +268,12 @@ ItemList *ItemList::calComplexPrefixWithNumberExponent(std::string expressionStr
 std::string ItemList::getCommonFactor()
 {
     std::list<Item*> targetItemList;
-    std::list<Cell*> commonFactorCellList;
-
-    while (mItemList.size()) {
-        Item *item = mItemList.front();
-        mItemList.pop_front();
+    Item *itemFirst = NULL;
+    Item itemRet;
 
 
+    return itemRet.mStrItem;
 
-    }
 }
 
 
