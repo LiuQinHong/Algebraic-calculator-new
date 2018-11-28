@@ -33,6 +33,14 @@ void Item::delCell(Cell* cell)
     delete cell;
 }
 
+void Item::delCell(std::string cellStr)
+{
+    Cell cell(cellStr);
+    Cell *fCell = findCell(&cell);
+    if (fCell)
+        delCell(fCell);
+}
+
 void Item::delAllCell()
 {
     for(std::list<Cell*>::iterator celllist_iter = mCellList.begin(); celllist_iter!= mCellList.end(); ++celllist_iter) {
@@ -47,6 +55,46 @@ void Item::eraseAllCell()
         mCellList.erase(celllist_iter++);
     }
 }
+
+Cell *Item::findCell(Cell *cell)
+{
+    for(std::list<Cell*>::iterator celllist_iter = mCellList.begin(); celllist_iter!= mCellList.end(); ++celllist_iter) {
+        Cell *curCell = (*celllist_iter);
+        if (*curCell == *cell)
+            return curCell;
+    }
+
+    return NULL;
+}
+
+Cell *Item::findCell(std::string cellStr)
+{
+    Cell cell(cellStr);
+    for(std::list<Cell*>::iterator celllist_iter = mCellList.begin(); celllist_iter!= mCellList.end(); ++celllist_iter) {
+        Cell *curCell = (*celllist_iter);
+        if (*curCell == cell)
+            return curCell;
+    }
+
+    return NULL;
+}
+
+
+void Item::replaceCell(Cell* srcCell, Cell *dstCell)
+{
+    srcCell->mStrCell = dstCell->mStrCell;
+    srcCell->updateCellType();
+}
+
+void Item::replaceCell(std::string srcCellStr, std::string dstCellStr)
+{
+    Cell *cell = findCell(srcCellStr);
+    if (cell) {
+        cell->mStrCell = dstCellStr;
+        cell->updateCellType();
+    }
+}
+
 
 bool Item::isSimpleNumber(std::string str)
 {
@@ -95,6 +143,8 @@ void Item::parseItemToCell(std::string& strItem)
     int iPosEnd = 0;
     std::string tmpStr = strItem;
 
+    if (strItem.empty())
+        return;
 
     if ((strItem.at(0) == '+') || strItem.at(0) == '-')
         tmpStr = strItem.substr(1);
@@ -172,7 +222,7 @@ void Item::parseCelltoItem()
 }
 
 /* a^2 ---> a*a */
-/* exp[123]^(3)*pi[123]^(2)*a^(2)*2^(3) */
+/* exp[123]^(3)*pi[123]^(2)*a^(2)*2^(3)*a^(a)*a*a */
 void Item::exponentUnfold(void)
 {
     std::string exponentStr;
@@ -180,18 +230,18 @@ void Item::exponentUnfold(void)
     std::string tmpStr;
     int iCount = 0;
 
-
     tmpStr = mStrItem.at(0);
+
 
     for(std::list<Cell*>::iterator celllist_iter = mCellList.begin(); celllist_iter!= mCellList.end(); ++celllist_iter) {
 
         exponentStr = (*celllist_iter)->getExponent();
-        if (exponentStr.empty())
-            continue;
-
         prefixStr = (*celllist_iter)->getExponentPrefix();
-        if (prefixStr.empty())
+        if (exponentStr.empty()) {
+            tmpStr += (*celllist_iter)->mStrCell;
+            tmpStr += "*";
             continue;
+        }
 
         if (!(*celllist_iter)->isNumber(exponentStr)) {
             tmpStr += (*celllist_iter)->mStrCell;
@@ -209,11 +259,15 @@ void Item::exponentUnfold(void)
         }
     }
 
-    tmpStr.pop_back();
-    mStrItem = tmpStr;
+    if (!tmpStr.empty()) {
+        tmpStr.pop_back();
+        mStrItem = tmpStr;
+    }
 
     delAllCell();
     parseItemToCell(mStrItem);
+    updateFromAllCell();
+
 }
 
 /* +a*a*b*b ---> +a^(2)*b^(2) */
@@ -230,8 +284,6 @@ void Item::exponentFold(void)
     std::string tmpStr;
 
     tmpStr = mStrItem.at(0);
-
-
 
     while (mCellList.size()) {
         while (mCellList.size()) {
@@ -291,7 +343,8 @@ void Item::exponentFold(void)
 
                 delete targetCell;
             }
-            tmpStr.pop_back();
+            if (!tmpStr.empty())
+                tmpStr.pop_back();
             tmpStr += ")*";
         }
 
@@ -303,7 +356,8 @@ void Item::exponentFold(void)
     }
 
     /* 去掉尾部的"*"  a*b*c* ---> a*b*c */
-    tmpStr.pop_back();
+    if (!tmpStr.empty())
+        tmpStr.pop_back();
 
     mStrItem = tmpStr;
     delAllCell();
@@ -352,7 +406,8 @@ void Item::digitalMerge(void)
     numStream >> numStr;
 
     tmpStr = mStrItem.at(0) + numStr + "*" + tmpStr;
-    tmpStr.pop_back();
+    if (!tmpStr.empty())
+        tmpStr.pop_back();
 
     delAllCell();
     mStrItem = tmpStr;
@@ -375,7 +430,8 @@ void Item::updateFromAllCell(void)
         tmpStr += (*celllist_iter)->mStrCell;
         tmpStr += "*";
     }
-    tmpStr.pop_back();
+    if (!tmpStr.empty())
+        tmpStr.pop_back();
     mStrItem = tmpStr;
 }
 

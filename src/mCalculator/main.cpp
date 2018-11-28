@@ -10,18 +10,31 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     mCalculator w;
-    //ItemList *itemListLeft = ItemList::calComplexPrefixWithNumberExponent("(a+b)^2 + (exp^(2)+a)^2");
-    //ItemList *itemListRight = ItemList::calComplexPrefixWithNumberExponent("(exp^(2)+a)^2+(b+a)^2");
+    QString den;
+    QString mole;
 
-    ItemList *itemListLeft = new ItemList("+1*a*exp*pi*a[0]*exp[0]*pi[0]*1^a*a^2*exp^2*pi^2*(a+b^(c))^a*a^(a+b^(c))*(a+b^(c))^(a+b^(c))*a[0]^2*exp[0]^2*pi[0]^2");
-    ItemList *itemListRight = new ItemList("-1*a*exp*pi*a[0]*exp[0]*pi[0]*a^(a+b^(c))*(a+b^(c))^(a+b^(c))*a[0]^2*exp[0]^2*pi[0]^2*1^a*a^2*exp^2*pi^2*(a+b^(c))^a");
-    if (*itemListLeft == *itemListRight)
-        qDebug() << "*itemListLeft == *itemListRight";
-    else
-        qDebug() << "*itemListLeft != *itemListRight";
+    Separation("exp*a*b/(a*b)*a^b+(a^a+b)^3",den, mole);
 
-    itemListLeft->printAllItem();
-    itemListRight->printAllItem();
+    qDebug() << "den = "<< den;
+    qDebug() << "mole = "<< mole;
 
+
+    ItemList *itemListDen = ItemList::calComplexPrefixWithNumberExponent(den.toStdString());
+    qDebug() << "itemListDen = "<< itemListDen->mExpressionStr.c_str();
+
+    ItemList *itemListMole = ItemList::calComplexPrefixWithNumberExponent(mole.toStdString());
+    qDebug() << "itemListMole = "<< itemListMole->mExpressionStr.c_str();
+
+    itemListDen->allExponentUnFold();
+    itemListMole->allExponentUnFold();
+
+    ItemList::fraction(itemListDen, itemListMole);
+    itemListDen->allExponentFold();
+    itemListMole->allExponentFold();
+
+
+
+    qDebug() << "itemListDen = "<< itemListDen->mExpressionStr.c_str();
+    qDebug() << "itemListMole = "<< itemListMole->mExpressionStr.c_str();
     return 0;
 }

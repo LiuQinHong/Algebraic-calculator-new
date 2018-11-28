@@ -134,6 +134,17 @@ void ItemList::delAllItem(void)
     mItemList.clear();
 }
 
+Item *ItemList::findItem(Item* item)
+{
+    for(std::list<Item*>::iterator itemlist_iter = mItemList.begin(); itemlist_iter!= mItemList.end(); ++itemlist_iter) {
+        Item *curItem = (*itemlist_iter);
+        if (*curItem == *item)
+            return curItem;
+    }
+
+    return NULL;
+}
+
 
 void ItemList::deleteAllMark(std::string &s, const std::string &mark)
 {
@@ -219,6 +230,7 @@ void ItemList::updateFromAllItem(void)
 
 void ItemList::allExponentUnFold(void)
 {
+
     for(std::list<Item*>::iterator itemlist_iter = mItemList.begin(); itemlist_iter!= mItemList.end(); ++itemlist_iter) {
         (*itemlist_iter)->exponentUnfold();
     }
@@ -249,8 +261,10 @@ ItemList *ItemList::calComplexPrefixWithNumberExponent(std::string expressionStr
     QString den;
     QString mole;
     ItemList *itemListOrg = new ItemList(expressionStr);
+    itemListOrg->printAllItem();
 
     itemListOrg->allExponentUnFold();
+
 
     Separation(itemListOrg->mExpressionStr.c_str()+1, den, mole);
     delete itemListOrg;
@@ -267,21 +281,76 @@ ItemList *ItemList::calComplexPrefixWithNumberExponent(std::string expressionStr
 
 std::string ItemList::getCommonFactor()
 {
-    std::list<Item*> targetItemList;
-    Item *itemFirst = NULL;
-    Item itemRet;
+    bool boolFlag = true;
+    std::string strRet;
+    ItemList itemListTmp(mExpressionStr);
+    Item *itemFirst = itemListTmp.mItemList.front();
+    itemListTmp.mItemList.pop_front();
 
 
-    return itemRet.mStrItem;
+    while (itemFirst->mCellList.size()) {
+        Cell *firstCell = itemFirst->mCellList.front();
+        itemFirst->mCellList.pop_front();
+        boolFlag = true;
 
+
+        for(std::list<Item*>::iterator itemlist_iter = itemListTmp.mItemList.begin(); itemlist_iter!= itemListTmp.mItemList.end(); ++itemlist_iter) {
+            Item *itemCur = (*itemlist_iter);
+            Cell *findCell = itemCur->findCell(firstCell);
+            if (findCell) {
+                itemCur->delCell(findCell);
+            }
+            else {
+                boolFlag = false;
+                break;
+            }
+        }
+
+        if (boolFlag)
+            strRet += firstCell->mStrCell + "*";
+
+        delete firstCell;
+    }
+
+    if (!strRet.empty())
+        strRet.pop_back();
+
+    return strRet;
 }
 
+void ItemList::removeCommonFactor(std::string strCommonFactor)
+{
+    Item itemTmp(strCommonFactor);
+
+
+    for(std::list<Cell*>::iterator celllist_iter = itemTmp.mCellList.begin(); celllist_iter!= itemTmp.mCellList.end(); ++celllist_iter) {
+        Cell *curCell = (*celllist_iter);
+
+        for(std::list<Item*>::iterator itemlist_iter = mItemList.begin(); itemlist_iter!= mItemList.end(); ++itemlist_iter) {
+            Item *itemCur = (*itemlist_iter);
+            itemCur->replaceCell(curCell->mStrCell, "1");
+        }
+    }
+
+    updateFromAllItem();
+}
 
 /* den : +a*b*c*exp*(a+b)^(c+d) + a^3*(exp^a+b)^(c+d)*exp*b*(a+b)^(d) + a^(b+c)*(a+b)^(e) */
 /* mole : -a*d*b*exp + a*(a + exp^b)^(c+d)*b*exp */
-ItemList *ItemList::fraction(ItemList *den, ItemList *mole)
+void ItemList::fraction(ItemList *den, ItemList *mole)
 {
+    if (!den || !mole)
+        return;
 
+    std::string denCommonFactor = den->getCommonFactor();
+    std::string moleCommonFactor = mole->getCommonFactor();
+    ItemList itemList(denCommonFactor + "+" + moleCommonFactor);
+
+    if (denCommonFactor.empty() || moleCommonFactor.empty())
+        return;
+
+    den->removeCommonFactor(itemList.getCommonFactor());
+    mole->removeCommonFactor(itemList.getCommonFactor());
 }
 
 

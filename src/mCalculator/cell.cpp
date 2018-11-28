@@ -497,7 +497,8 @@ std::string Cell::getExponent()
     iPosLeft = mStrCell.find('(', 0);
     if (iPosLeft < 0 || iPosLeft > iPos) {
         subStr = mStrCell.substr(iPos + 2);
-        subStr.pop_back();
+        if (!subStr.empty())
+            subStr.pop_back();
         return subStr;
     }
     else {
@@ -521,7 +522,8 @@ std::string Cell::getExponent()
 
         if (boolFlag) {
             subStr = mStrCell.substr(iPosRight - iPosLeft + 2);
-            subStr.pop_back();
+            if (!subStr.empty())
+                subStr.pop_back();
             return subStr;
         }
         else
@@ -716,11 +718,12 @@ bool Cell::operator==(Cell& cell)
     if (mCellType == COMPLEXEXPRESSION) {
         std::string strLeft = mStrCell;
         std::string strRight = cell.mStrCell;
-
-        strLeft.pop_back();
+        if (!strLeft.empty())
+            strLeft.pop_back();
         strLeft = strLeft.substr(1);
 
-        strRight.pop_back();
+        if (!strRight.empty())
+            strRight.pop_back();
         strRight = strRight.substr(1);
 
         ItemList itemLisLeft(strLeft);
@@ -738,13 +741,15 @@ bool Cell::operator==(Cell& cell)
 
 
     if (strExponentPrefixLeft.at(0) == '(' && strExponentPrefixLeft.at(strExponentPrefixLeft.size() - 1) == ')') {
-        strExponentPrefixLeft.pop_back();
+        if (!strExponentPrefixLeft.empty())
+            strExponentPrefixLeft.pop_back();
         strExponentPrefixLeft = strExponentPrefixLeft.substr(1);
     }
 
 
     if (strExponentPrefixRight.at(0) == '(' && strExponentPrefixRight.at(strExponentPrefixRight.size() - 1) == ')') {
-        strExponentPrefixRight.pop_back();
+        if (!strExponentPrefixRight.empty())
+            strExponentPrefixRight.pop_back();
         strExponentPrefixRight = strExponentPrefixRight.substr(1);
     }
 

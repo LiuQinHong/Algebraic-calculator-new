@@ -24,6 +24,8 @@ public:
     void delItem(Item* item);
     void delAllItem(void);
 
+    Item *findItem(Item* item);
+
     void deleteAllMark(std::string &s, const std::string &mark);
     int stringSplit(std::vector<std::string>& dst, const std::string src, const std::string& separator);
     void strReplace(std::string& str, const std::string& strsrc, const std::string& strdst);
@@ -36,10 +38,10 @@ public:
     void allExponentFold(void);
 
     static ItemList *calComplexPrefixWithNumberExponent(std::string expressionStr);
-    static ItemList *fraction(ItemList *den, ItemList *mole);
+    static void fraction(ItemList *den, ItemList *mole);
 
     std::string getCommonFactor();
-
+    void removeCommonFactor(std::string strCommonFactor);
 
     bool operator==(ItemList& itemList);
 };

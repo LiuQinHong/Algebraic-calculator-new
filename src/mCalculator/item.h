@@ -35,8 +35,13 @@ public:
 
     void addCell(Cell* cell);
     void delCell(Cell* cell);
+    void delCell(std::string cellStr);
     void delAllCell();
     void eraseAllCell();
+    Cell *findCell(Cell *cell);
+    Cell *findCell(std::string cellStr);
+    void replaceCell(Cell* srcCell, Cell *dstCell);
+    void replaceCell(std::string srcCellStr, std::string dstCellStr);
 
     bool isSimpleNumber(std::string str);
     bool isSimpleAlpha(std::string str);
