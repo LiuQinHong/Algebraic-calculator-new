@@ -22,7 +22,6 @@ int Merge::mergeItem()
         }
         flag = true;
 
-        coefStr.clear();
         coefFlag = true;
         for(std::list<Item*>::iterator nextList_iter = itemListTemp_i->mItemList.begin();
             nextList_iter!= itemListTemp_i->mItemList.end(); ++nextList_iter){
@@ -78,12 +77,19 @@ int Merge::mergeItem()
 
             qDebug() << "printf coefItem:" << coefItemList.mExpressionStr.c_str();
             std::string coefItemTemp = coefItemList.mExpressionStr;
-            if(coefItemTemp.at(0) == '+')
-                coefItemTemp.replace(0,1,"(");
-            else
-                coefItemTemp.insert(0,1,'(');
+            int addFlag = coefItemTemp.find("+",1);
+            int delFlag = coefItemTemp.find("-",1);
 
-            coefItemTemp.append(")*");
+            if((addFlag >= 0) || (delFlag >= 0)){
+                if(coefItemTemp.at(0) == '+')
+                    coefItemTemp.replace(0,1,"(");
+                else
+                    coefItemTemp.insert(0,1,'(');
+
+                coefItemTemp.append(")*");
+            }
+            else
+                coefItemTemp.append("*");
 
             qDebug() << "coefItemTemp :" << coefItemTemp.c_str();
             qDebug() << "after coefItem (*itemlist_iter)->mStrItem :" << (*itemlist_iter)->mStrItem.c_str();
@@ -95,6 +101,7 @@ int Merge::mergeItem()
             (*itemlist_iter)->parseItemToCell((*itemlist_iter)->mStrItem);
 
         }
+        coefStr.clear();
 
     }
     //整理多项式,把系数为0的删掉,系数为1的去掉系数
@@ -253,6 +260,7 @@ int Merge::judgeItem(Item& origItem, Item& newItem,bool t)
 *********************************************/
 void Merge::extractItemcoefAll(Item &origItem,Item &nextItem)
 {
+    bool coefAllFlag = false;
     if(coefFlag){
         //遍历Cell链表提取系数
         for(std::list<Cell*>::iterator origList_iter = origItem.mCellList.begin();
@@ -266,6 +274,7 @@ void Merge::extractItemcoefAll(Item &origItem,Item &nextItem)
                     origItem.mCellList.erase(origList_iter++);
                 else
                     ++origList_iter;
+                coefAllFlag = true;
             }
             else
                 ++origList_iter;
@@ -275,12 +284,25 @@ void Merge::extractItemcoefAll(Item &origItem,Item &nextItem)
     }
     coefFlag = false;
     origItem.updateFromAllCell();
-    qDebug() << "after parseCelltoItem and delcoef origItem = " << origItem.mStrItem.c_str();
-    if(nextItem.mStrItem.at(0) == '+')
-        coefStr.append("+");
-    else
-        coefStr.append("-");
-
+    qDebug() << "updateFromAllCell " << origItem.mStrItem.c_str();
+    qDebug() << "nextItem.mStrItem.at(0) " << nextItem.mStrItem.c_str();
+    if(coefAllFlag){
+        if(nextItem.mStrItem.at(0) == '+'){
+            qDebug() << "nextItem.mStrItem.at(0) " << nextItem.mStrItem.c_str();
+            coefStr.append("+");
+            qDebug() << "nextItem.mStrItem.at(0) " << nextItem.mStrItem.c_str();
+        }
+        else
+            coefStr.append("-");
+    }
+    else{
+        if(origItem.mStrItem.at(0) == '+')
+            coefStr = "+1";
+        else
+            coefStr = "-1";
+    }
+    coefAllFlag = false;
+    qDebug() << "nextItem.mStrItem.at(0) ";
     for(std::list<Cell*>::iterator nextList_iter = nextItem.mCellList.begin();
         nextList_iter!= nextItem.mCellList.end();){
         if((*nextList_iter)->mCellType == NUMBER || (*nextList_iter)->mCellType == EXP ||
@@ -292,13 +314,23 @@ void Merge::extractItemcoefAll(Item &origItem,Item &nextItem)
                 origItem.mCellList.erase(nextList_iter++);
             else
                 ++nextList_iter;
+            coefAllFlag = true;
         }
         else
             ++nextList_iter;
     }
     nextItem.updateFromAllCell();
     qDebug() << "after parseCelltoItem and delcoef nextItem = " << nextItem.mStrItem.c_str();
-    coefStr.pop_back();
+    if(coefAllFlag)
+        coefStr.pop_back();
+    else{
+        if(nextItem.mStrItem.at(0) == '+')
+            coefStr += "+1";
+        else
+            coefStr += "-1";
+    }
+
+
     qDebug() << "coefStr = " << coefStr.c_str();
 }
 
@@ -318,7 +350,7 @@ double Merge::calculateCoef(Item &origItem,Item &nextItem)
           }
       }
       origItem.updateFromAllCell();
-      qDebug() << "after parseCelltoItem and delcoef origItem = " << origItem.mStrItem.c_str();
+      qDebug() << "after parseCelltoItem and calculateCoef origItem = " << origItem.mStrItem.c_str();
       if(!oneCoefFlag)
           origCoef = 1;
       if(origItem.mStrItem.at(0) == '-')
@@ -335,7 +367,7 @@ double Merge::calculateCoef(Item &origItem,Item &nextItem)
           }
       }
       nextItem.updateFromAllCell();
-      qDebug() << "after parseCelltoItem and delcoef nextItem = " << nextItem.mStrItem.c_str();
+      qDebug() << "after parseCelltoItem and calculateCoef nextItem = " << nextItem.mStrItem.c_str();
 
       if(!oneCoefFlag)
           nextCoef = 1;
