@@ -21,6 +21,8 @@ public:
 
     ~Transform();
 
+    void deleteAllMark(std::string &s, const std::string &mark);
+
     bool transform();
 
     bool transforms(ItemList &itemList);

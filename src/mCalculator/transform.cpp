@@ -16,6 +16,20 @@ Transform::~Transform()
     delete outHtml;
 }
 
+void Transform::deleteAllMark(std::string &s, const std::string &mark)
+{
+    size_t nSize = mark.size();
+    while(1) {
+        size_t pos = s.find(mark);
+
+        if(pos == std::string::npos)	{
+            return;
+        }
+
+        s.erase(pos, nSize);
+    }
+}
+
 void Transform::toSymbol(Item &item)
 {
     if(denominatorFlag){
@@ -73,7 +87,8 @@ void Transform::toSuper(Cell &cell)
         if(cell.getExponent().length() > 1 && (cell.getExponent().find('+') || cell.getExponent().find('-'))){
             std::string str = cell.getExponent();
             str.insert(0,"(");
-            str.insert(str.length()-1,")");
+            str.append(")");
+            deleteAllMark(str,"*");
             *outHtml += str;//幂
         }
         else
@@ -107,7 +122,8 @@ void Transform::toUnderSuper(Cell &cell)
         if(cell.getExponent().length() > 1 && (cell.getExponent().find('+') || cell.getExponent().find('-'))){
             std::string str = cell.getExponent();
             str.insert(0,"(");
-            str.insert(str.length()-1,")");
+            str.append(")");
+            deleteAllMark(str,"*");
             *outHtml += str;//幂
         }
         else

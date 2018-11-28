@@ -67,14 +67,19 @@
     <string>Please input Algebraic expression:</string>
    </property>
   </widget>
-  <widget class="QTextEdit" name="textEdit_2">
+  <widget class="QTextEdit" name="textEdit_input">
    <property name="geometry">
     <rect>
      <x>30</x>
      <y>600</y>
      <width>750</width>
-     <height>30</height>
+     <height>35</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>22</pointsize>
+    </font>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_equal">
@@ -83,7 +88,7 @@
      <x>790</x>
      <y>600</y>
      <width>80</width>
-     <height>30</height>
+     <height>35</height>
     </rect>
    </property>
    <property name="font">
@@ -101,7 +106,7 @@
      <x>880</x>
      <y>600</y>
      <width>80</width>
-     <height>30</height>
+     <height>35</height>
     </rect>
    </property>
    <property name="font">

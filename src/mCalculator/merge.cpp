@@ -218,6 +218,7 @@ int Merge::judgeItem(Item& origItem, Item& newItem,bool t)
     Item newtemTemp = newItem;
     qDebug() << "origitemTemp = " << origitemTemp.mStrItem.c_str() << " : mType = " << origitemTemp.mType;
     qDebug() << "newtemTemp = " << newtemTemp.mStrItem.c_str() << " : mType = " << newtemTemp.mType;
+    qDebug() << "t = " << t;
     if((origitemTemp.mType == newtemTemp.mType) && (origitemTemp.mType == SIMPLENUMBER)){
         return NUMBERFLAG;
     }
@@ -477,10 +478,10 @@ double Merge::extractItemcoef(Item &origItem, Item &nextItem)
 {
     double origCoef = 0,nextCoef = 0;
     bool oneCoefFlag = false;
-
+    qDebug() << "Enter extractItemcoef";
     //遍历Cell链表提取系数
     for(std::list<Cell*>::iterator origList_iter = origItem.mCellList.begin();
-        origList_iter!= origItem.mCellList.end(); ++origList_iter){
+        origList_iter!= origItem.mCellList.end();){
         if((*origList_iter)->mCellType == NUMBER){
             origCoef += atoi((*origList_iter)->mStrCell.c_str());
             if(origList_iter != origItem.mCellList.end())
@@ -492,8 +493,9 @@ double Merge::extractItemcoef(Item &origItem, Item &nextItem)
         else
             ++origList_iter;
     }
+    qDebug() << "orig for over";
     origItem.updateFromAllCell();
-    //qDebug() << "after parseCelltoItem and delcoef origItem = " << origItem.mStrItem.c_str();
+    qDebug() << "after parseCelltoItem and extractItemcoef origItem = " << origItem.mStrItem.c_str();
     if(!oneCoefFlag)
         origCoef = 1;
     if(origItem.mStrItem.at(0) == '-')
@@ -501,7 +503,7 @@ double Merge::extractItemcoef(Item &origItem, Item &nextItem)
     oneCoefFlag = false;
 
     for(std::list<Cell*>::iterator nextList_iter = nextItem.mCellList.begin();
-        nextList_iter!= nextItem.mCellList.end(); ++nextList_iter){
+        nextList_iter!= nextItem.mCellList.end();){
         if((*nextList_iter)->mCellType == NUMBER){
             nextCoef += atoi((*nextList_iter)->mStrCell.c_str());
             if(nextList_iter != nextItem.mCellList.end())
@@ -514,7 +516,7 @@ double Merge::extractItemcoef(Item &origItem, Item &nextItem)
             ++nextList_iter;
     }
     nextItem.parseCelltoItem();
-    //qDebug() << "after parseCelltoItem and delcoef nextItem = " << nextItem.mStrItem.c_str();
+    qDebug() << "after parseCelltoItem and extractItemcoef nextItem = " << nextItem.mStrItem.c_str();
 
     if(!oneCoefFlag)
         nextCoef = 1;

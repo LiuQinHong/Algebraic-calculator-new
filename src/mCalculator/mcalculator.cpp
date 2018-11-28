@@ -33,7 +33,7 @@ mCalculator::mCalculator(QWidget *parent) :
     QString den;
     QString mole;
 
-    Separation("exp*a*b/(a*b)*a^b+(a^a+b)^3",den, mole);
+    Separation("exp+exp",den, mole);
 
     qDebug() << "den = "<< den;
     qDebug() << "mole = "<< mole;
@@ -57,18 +57,22 @@ mCalculator::mCalculator(QWidget *parent) :
     qDebug() << "itemListDen = "<< itemListDen->mExpressionStr.c_str();
     qDebug() << "itemListMole = "<< itemListMole->mExpressionStr.c_str();
 
-    Merge merge(itemListDen);
-    merge.makeItem(itemListDen);
+    Merge merge(itemListMole);
+    merge.makeItem(itemListMole);
 
 
     itemListMole->printAllItem();
 
-    ItemList *test = new ItemList("b^(c+d)+(a+b)^(a+b)");
-    test->printAllItem();
+    /*ItemList *test = new ItemList("b^(c+d)+(a+b)^(a+b)");
+    test->printAllItem();*/
 
-    Transform tt(*test,true);
+    Transform tt(*itemListMole,true);
     tt.transform();
+    Transform tt1(*itemListMole,false);
+    tt1.transform();
     QString QoutHtml(tt.getOutHtml()->c_str());
+    QString QoutHtml1(tt1.getOutHtml()->c_str());
+    QoutHtml += QoutHtml1;
 
     ui->textEdit_display->setText(QoutHtml);
 }
@@ -85,10 +89,15 @@ void mCalculator::paintEvent(QPaintEvent *event){
 
 void mCalculator::on_pushButton_equal_clicked()
 {
-
+    inputExpression = ui->textEdit_input->toPlainText();
 }
 
 void mCalculator::on_pushButton_del_clicked()
 {
-
+     QTextCursor cursor = ui->textEdit_input->textCursor();
+     if(cursor.hasSelection())
+         cursor.clearSelection();
+     cursor.deletePreviousChar();
+     ui->textEdit_input->setTextCursor(cursor);
+     ui->textEdit_input->show();
 }

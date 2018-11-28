@@ -35,6 +35,8 @@ private:
     QLabel      *inputLbael;
     QTextEdit   *displayTextEdit;
     QTextEdit   *inputTextEdit;
+    QString inputExpression;
+
 };
 
 #endif // MCALCULATOR_H
