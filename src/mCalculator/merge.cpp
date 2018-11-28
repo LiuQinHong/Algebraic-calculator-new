@@ -280,7 +280,8 @@ void Merge::extractItemcoefAll(Item &origItem,Item &nextItem)
                 ++origList_iter;
 
         }
-        coefStr.pop_back();
+        if(!coefStr.empty())
+            coefStr.pop_back();
     }
     coefFlag = false;
     origItem.updateFromAllCell();
@@ -321,8 +322,10 @@ void Merge::extractItemcoefAll(Item &origItem,Item &nextItem)
     }
     nextItem.updateFromAllCell();
     qDebug() << "after parseCelltoItem and delcoef nextItem = " << nextItem.mStrItem.c_str();
-    if(coefAllFlag)
-        coefStr.pop_back();
+    if(coefAllFlag){
+        if(!coefStr.empty())
+            coefStr.pop_back();
+    }
     else{
         if(nextItem.mStrItem.at(0) == '+')
             coefStr += "+1";
