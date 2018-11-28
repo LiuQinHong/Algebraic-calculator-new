@@ -2,6 +2,10 @@
 #include "ui_mcalculator.h"
 #include <transform.h>
 #include <merge.h>
+#include <algorithm>
+#include <qdebug.h>
+#include <iostream>
+#include <separation.h>
 
 mCalculator::mCalculator(QWidget *parent) :
     QWidget(parent),
@@ -26,17 +30,47 @@ mCalculator::mCalculator(QWidget *parent) :
     ui->label_name->setAlignment(Qt::AlignHCenter);
 
     ui->textEdit_display->setText("<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">(a+b)<span style=\" vertical-align:super;\">(a+b)</span></p>");
+    QString den;
+    QString mole;
 
-    /*ItemList test("111+222+b*c*d+a^b+b^a-2*a*b*pi-3*a*b*pi+3*a*b*exp+(a[1]+b[1]^3)^2+(a+b^3)^(a[1]+b)");
-    test.printAllItem();
-    Merge merge(&test);
-    merge.mergeItem();
-    test.printAllItem();
-    Transform tt(test,true);
+    Separation("exp*a*b/(a*b)*a^b+(a^a+b)^3",den, mole);
+
+    qDebug() << "den = "<< den;
+    qDebug() << "mole = "<< mole;
+
+
+    ItemList *itemListDen = ItemList::calComplexPrefixWithNumberExponent(den.toStdString());
+    qDebug() << "itemListDen = "<< itemListDen->mExpressionStr.c_str();
+
+    ItemList *itemListMole = ItemList::calComplexPrefixWithNumberExponent(mole.toStdString());
+    qDebug() << "itemListMole = "<< itemListMole->mExpressionStr.c_str();
+
+    itemListDen->allExponentUnFold();
+    itemListMole->allExponentUnFold();
+
+    ItemList::fraction(itemListDen, itemListMole);
+    itemListDen->allExponentFold();
+    itemListMole->allExponentFold();
+
+
+
+    qDebug() << "itemListDen = "<< itemListDen->mExpressionStr.c_str();
+    qDebug() << "itemListMole = "<< itemListMole->mExpressionStr.c_str();
+
+    Merge merge(itemListDen);
+    merge.makeItem(itemListDen);
+
+
+    itemListMole->printAllItem();
+
+    ItemList *test = new ItemList("b^(c+d)+(a+b)^(a+b)");
+    test->printAllItem();
+
+    Transform tt(*test,true);
     tt.transform();
     QString QoutHtml(tt.getOutHtml()->c_str());
 
-    ui->textEdit_display->setText(QoutHtml);*/
+    ui->textEdit_display->setText(QoutHtml);
 }
 
 mCalculator::~mCalculator()
