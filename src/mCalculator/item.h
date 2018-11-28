@@ -56,6 +56,8 @@ public:
     void updateFromAllCell(void);
     void printAllCell(void);
 
+    bool operator==(Item& item);
+
 };
 
 

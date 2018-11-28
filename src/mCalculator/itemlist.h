@@ -39,6 +39,9 @@ public:
     static ItemList *fraction(ItemList *den, ItemList *mole);
 
     std::string getCommonFactor();
+
+
+    bool operator==(ItemList& itemList);
 };
 
 #endif // ITEMLIST_H

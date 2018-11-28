@@ -27,6 +27,7 @@ enum CellType {
     NUMBERMIXEXPSUBSCRIPTWITHEXPONENT,	// 带下标的字母	: exp[0]^2
     NUMBERMIXPISUBSCRIPTWITHEXPONENT,	// 带下标的字母	: pi[0]^2
 
+    COMPLEXEXPRESSION,                  //(a+b+c^d)
     RESERVE,							// 保留
 };
 
@@ -63,6 +64,8 @@ public:
     bool isComplexPrefixWithSimpleExponent(std::string str);
     bool isSimplePrefixWithComplexExponent(std::string str);
     bool isComplexPrefixWithComplexExponent(std::string str);
+
+    bool isComplexExpression(std::string str);
 
     bool isComplex(std::string str);
     bool isSimple(std::string str);

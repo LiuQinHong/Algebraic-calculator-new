@@ -69,6 +69,8 @@ void Cell::updateCellType(void)
         mCellType = SIMPLEPREFIXWITHCOMPLEXEXPONENT;
     else if (isComplexPrefixWithComplexExponent(mStrCell))
         mCellType = COMPLEXPREFIXWITHCOMPLEXEXPONENT;
+    else if (isComplexExpression(mStrCell))
+        mCellType = COMPLEXEXPRESSION;
     else
         mCellType = RESERVE;
 }
@@ -259,7 +261,7 @@ bool Cell::isAlphaWithExponent(std::string str)
     if (iPos != 1)
         return false;
 
-    if (isComplex(strExponent))
+    if (!isSimple(strExponent))
         return false;
 
     return true;
@@ -405,6 +407,12 @@ bool Cell::isComplexPrefixWithComplexExponent(std::string str)
         return true;
     else
         return false;
+}
+
+/* (a+b+c^d) */
+bool Cell::isComplexExpression(std::string str)
+{
+    return str.at(0) == '(' && str.at(str.size() - 1) == ')';
 }
 
 
@@ -686,7 +694,95 @@ void Cell::addParentheses()
 
 bool Cell::operator==(Cell& cell)
 {
-    return (mStrCell == cell.mStrCell);
+
+    if (mCellType != cell.mCellType)
+        return false;
+
+    if (mStrCell == cell.mStrCell)
+        return true;
+
+    if (mStrCell.empty() || cell.mStrCell.empty())
+        return false;
+
+    if (isSimple(mStrCell) && isSimple(cell.mStrCell))
+        return mStrCell == cell.mStrCell;
+
+    std::string strExponentLeft = getExponent();
+    std::string strExponentPrefixLeft = getExponentPrefix();
+
+    std::string strExponentRight = cell.getExponent();
+    std::string strExponentPrefixRight = cell.getExponentPrefix();
+
+    if (mCellType == COMPLEXEXPRESSION) {
+        std::string strLeft = mStrCell;
+        std::string strRight = cell.mStrCell;
+
+        strLeft.pop_back();
+        strLeft = strLeft.substr(1);
+
+        strRight.pop_back();
+        strRight = strRight.substr(1);
+
+        ItemList itemLisLeft(strLeft);
+        ItemList itemLisRight(strRight);
+
+        return itemLisLeft == itemLisRight;
+
+
+    }
+
+
+
+    if (strExponentLeft.empty() || strExponentPrefixLeft.empty() || strExponentRight.empty() || strExponentPrefixRight.empty())
+        return false;
+
+
+    if (strExponentPrefixLeft.at(0) == '(' && strExponentPrefixLeft.at(strExponentPrefixLeft.size() - 1) == ')') {
+        strExponentPrefixLeft.pop_back();
+        strExponentPrefixLeft = strExponentPrefixLeft.substr(1);
+    }
+
+
+    if (strExponentPrefixRight.at(0) == '(' && strExponentPrefixRight.at(strExponentPrefixRight.size() - 1) == ')') {
+        strExponentPrefixRight.pop_back();
+        strExponentPrefixRight = strExponentPrefixRight.substr(1);
+    }
+
+
+    if (isSimple(strExponentLeft) && isSimple(strExponentRight)) {
+        if (strExponentLeft != strExponentRight)
+            return false;
+
+        if (isSimple(strExponentPrefixLeft) && isSimple(strExponentPrefixRight)) {
+            return strExponentPrefixLeft == strExponentPrefixRight;
+        }
+        else {
+            ItemList itemLisExponentPrefixtLeft(strExponentPrefixLeft);
+            ItemList itemLisExponentPrefixtRight(strExponentPrefixRight);
+
+            return itemLisExponentPrefixtLeft == itemLisExponentPrefixtRight;
+        }
+    }
+    else {
+
+        ItemList itemListExponentLeft(strExponentLeft);
+        ItemList itemListExponentRight(strExponentLeft);
+
+        if (!(itemListExponentLeft == itemListExponentRight))
+            return false;
+
+        if (isSimple(strExponentPrefixLeft) && isSimple(strExponentPrefixRight)) {
+
+            return strExponentLeft == strExponentRight;
+        }
+        else {
+            ItemList itemLisExponentPrefixtLeft(strExponentPrefixLeft);
+            ItemList itemLisExponentPrefixtRight(strExponentPrefixRight);
+
+            return itemLisExponentPrefixtLeft == itemLisExponentPrefixtRight;
+        }
+    }
+
 }
 
 

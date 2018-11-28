@@ -381,3 +381,46 @@ void Item::printAllCell(void)
     }
 }
 
+
+bool Item::operator==(Item& item)
+{
+    size_t size = 0;
+    std::list<Cell*> cellListLeft;
+    std::list<Cell*> cellListRight;
+
+
+    if (mCellList.size() != item.mCellList.size())
+        return false;
+
+    for(std::list<Cell*>::iterator celllist_iter_left = mCellList.begin(); celllist_iter_left!= mCellList.end(); ++celllist_iter_left) {
+        Cell *cellLeft = (*celllist_iter_left);
+        cellListLeft.push_back(cellLeft);
+    }
+
+    for(std::list<Cell*>::iterator celllist_iter_right = item.mCellList.begin(); celllist_iter_right!= item.mCellList.end(); ++celllist_iter_right) {
+        Cell *cellRight = (*celllist_iter_right);
+        cellListRight.push_back(cellRight);
+    }
+
+
+    for(std::list<Cell*>::iterator celllist_iter_left = cellListLeft.begin(); celllist_iter_left!= cellListLeft.end(); ++celllist_iter_left) {
+        Cell *cellLeft = (*celllist_iter_left);
+
+        for(std::list<Cell*>::iterator celllist_iter_right = cellListRight.begin(); celllist_iter_right!= cellListRight.end();) {
+            Cell *cellRight = (*celllist_iter_right);
+
+            if (*cellLeft == *cellRight) {
+                size++;
+                celllist_iter_right = cellListRight.erase(celllist_iter_right);
+            }
+
+            else
+                ++celllist_iter_right;
+        }
+    }
+
+
+
+    return size == mCellList.size();
+}
+

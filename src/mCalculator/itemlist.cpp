@@ -280,7 +280,7 @@ std::string ItemList::getCommonFactor()
 }
 
 
-/* den : +a*b*c*exp + a*(exp^a+b)^(c+d)*exp*b */
+/* den : +a*b*c*exp*(a+b)^(c+d) + a^3*(exp^a+b)^(c+d)*exp*b*(a+b)^(d) + a^(b+c)*(a+b)^(e) */
 /* mole : -a*d*b*exp + a*(a + exp^b)^(c+d)*b*exp */
 ItemList *ItemList::fraction(ItemList *den, ItemList *mole)
 {
@@ -289,6 +289,50 @@ ItemList *ItemList::fraction(ItemList *den, ItemList *mole)
 
 
 
+
+
+bool ItemList::operator==(ItemList& itemList)
+{
+    bool boolRet = true;
+    size_t size = 0;
+    std::list<Item*> itemListLeft;
+    std::list<Item*> itemListRight;
+
+    if (mItemList.size() != itemList.mItemList.size())
+        return false;
+
+
+    for(std::list<Item*>::iterator itemlist_iter_left = mItemList.begin(); itemlist_iter_left!= mItemList.end(); ++itemlist_iter_left) {
+        Item *itemLeft = (*itemlist_iter_left);
+        itemListLeft.push_back(itemLeft);
+    }
+
+    for(std::list<Item*>::iterator itemlist_iter_right = itemList.mItemList.begin(); itemlist_iter_right!= itemList.mItemList.end(); ++itemlist_iter_right) {
+        Item *itemRight = (*itemlist_iter_right);
+        itemListRight.push_back(itemRight);
+    }
+
+    for(std::list<Item*>::iterator itemlist_iter_left = itemListLeft.begin(); itemlist_iter_left!= itemListLeft.end(); ++itemlist_iter_left) {
+        Item *itemLeft = (*itemlist_iter_left);
+
+        for(std::list<Item*>::iterator itemlist_iter_right = itemListRight.begin(); itemlist_iter_right!= itemListRight.end();) {
+            Item *itemRight = (*itemlist_iter_right);
+
+            if (*itemLeft == *itemRight) {
+                size++;
+                itemlist_iter_right = itemListRight.erase(itemlist_iter_right);
+
+            }
+            else
+                 ++itemlist_iter_right;
+
+        }
+
+
+    }
+
+    return size == mItemList.size();
+}
 
 
 
