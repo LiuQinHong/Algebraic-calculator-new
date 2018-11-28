@@ -12,19 +12,13 @@ int main(int argc, char *argv[])
     mCalculator w;
     //ItemList *itemList = ItemList::calComplexPrefixWithNumberExponent("(a+b)^2 + (exp^(2)+a)^2");
 
-    ItemList *itemListLeft = new ItemList("(b^q+a) + (a+b^c)^(c+r*y)");
-    itemListLeft->printAllItem();
-    ItemList *itemListRight = new ItemList("(a+b^q) + (b^c+a)^(r*y+c)");
 
-    if (*itemListLeft == *itemListRight)
-        qDebug() << "itemListLeft == itemListRight";
-    else
-        qDebug() << "itemListLeft != itemListRight";
+    Item *item = new Item("123");
 
-    //ItemList itemList;
-    //itemList.setExpressionStr("+2*a^(2)+2*a*exp^(2)+exp^(4)+b^(2)+2*b*a");
-    //itemList.printAllItem();
+    item->delAllCell();
+    item->mStrItem = "(5*pi+3*exp)*a*b";
 
-    //delete itemList;
+    item->parseItemToCell(item->mStrItem);
+    qDebug() << "mStrItem = " << item->mStrItem.c_str();
     return 0;
 }

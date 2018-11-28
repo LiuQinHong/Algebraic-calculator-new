@@ -363,7 +363,12 @@ void Item::updateFromAllCell(void)
 {
     std::string tmpStr;
 
-    tmpStr = mStrItem.at(0);
+
+    if ((mStrItem.at(0) == '+') || mStrItem.at(0) == '-')
+        tmpStr = mStrItem.at(0);
+    else
+        tmpStr = "+";
+
 
     for(std::list<Cell*>::iterator celllist_iter = mCellList.begin(); celllist_iter!= mCellList.end(); ++celllist_iter) {
         (*celllist_iter)->updateCellType();
