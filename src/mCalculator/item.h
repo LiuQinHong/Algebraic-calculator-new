@@ -66,6 +66,7 @@ public:
 
     void sortAllCell(void);
 
+    void removeOne(void);
     bool operator==(Item& item);
 
 };

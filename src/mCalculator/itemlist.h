@@ -53,6 +53,10 @@ public:
 
     void sortAllItem(void);
 
+    void factor(void);
+
+    void removeOne(void);
+
     bool operator==(ItemList& itemList);
 };
 

@@ -1,4 +1,4 @@
-#include "mcalculator.h"
+#include <mcalculator.h>
 #include "ui_mcalculator.h"
 #include <transform.h>
 #include <merge.h>
@@ -42,6 +42,9 @@ mCalculator::mCalculator(QWidget *parent) :
     qDebug() << "mCalculator ========= den = " << den.mExpressionStr.c_str();
     qDebug() << "mCalculator ========= mole = " << mole.mExpressionStr.c_str();
 
+    den.factor();
+    mole.factor();
+
     Merge merge(&den);
     merge.makeItem(&den);
     Merge merge1(&mole);
@@ -50,12 +53,7 @@ mCalculator::mCalculator(QWidget *parent) :
     qDebug() << "mCalculator ========= den = " << den.mExpressionStr.c_str();
     qDebug() << "mCalculator ========= mole = " << mole.mExpressionStr.c_str();
 
-    //itemListMole->printAllItem();
-
-    /*ItemList *test = new ItemList("+1+a");
-    Merge merge2(test);
-    merge2.makeItem(test);*/
-
+    displayText(den, mole);
 }
 
 mCalculator::~mCalculator()

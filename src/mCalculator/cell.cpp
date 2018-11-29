@@ -15,7 +15,6 @@ Cell::Cell(const std::string& strCell)
 {
 
     addParentheses();
-
     updateCellType();
 
     //std::cout << "Cell::Cell(const std::string& strCell) start" << std::endl;

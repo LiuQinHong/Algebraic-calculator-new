@@ -3,6 +3,7 @@
 #include <merge.h>
 #include <separation.h>
 #include <QString>
+#include <mcalculator.h>
 
 
 ItemList::ItemList(const std::string &str)
@@ -112,6 +113,7 @@ void ItemList::setExpressionStr(const std::string &str)
 
     /* cell 模块种可能会添加括号，所以需要更新信息 */
     updateFromAllItem();
+    sortAllItem();
 }
 
 
@@ -379,6 +381,37 @@ void ItemList::sortAllItem(void)
     updateFromAllItem();
 }
 
+void ItemList::factor(void)
+{
+    std::string strCommonFactor = getCommonFactor();
+    removeCommonFactor(strCommonFactor);
+
+    ItemList tmpItemList(mExpressionStr);
+    tmpItemList.removeOne();
+
+
+    if (tmpItemList.mExpressionStr.empty())
+        mExpressionStr = strCommonFactor;
+    else
+        mExpressionStr = strCommonFactor + "*(" + tmpItemList.mExpressionStr + ")";
+
+
+    setExpressionStr(mExpressionStr);
+
+    Merge merge(this);
+    merge.makeItem(this);
+}
+
+void ItemList::removeOne(void)
+{
+    for(std::list<Item*>::iterator itemlist_iter = mItemList.begin(); itemlist_iter!= mItemList.end(); ++itemlist_iter) {
+        Item *itemCur = (*itemlist_iter);
+        itemCur->removeOne();
+    }
+
+    updateFromAllItem();
+}
+
 /* den : +a*b*c*exp*(a+b)^(c+d) + a^3*(exp^a+b)^(c+d)*exp*b*(a+b)^(d) + a^(b+c)*(a+b)^(e) */
 /* mole : -a*d*b*exp + a*(a + exp^b)^(c+d)*b*exp */
 void ItemList::fraction(ItemList *den, ItemList *mole)
@@ -411,6 +444,7 @@ int ItemList::process(std::string src,ItemList *den, ItemList *mole)
     iRet = Separation(src.c_str() ,denStr, moleStr);
     if (iRet < 0)
         return -1;
+
 
     ItemList *itemListDen = ItemList::calComplexPrefixWithNumberExponent(denStr.toStdString());
     ItemList *itemListMole = ItemList::calComplexPrefixWithNumberExponent(moleStr.toStdString());

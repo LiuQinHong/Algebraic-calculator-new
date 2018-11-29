@@ -18,6 +18,7 @@ Item::Item(const std::string& strItem)
     else if(isMix(mStrItem))
         mType = MIX;
 
+
     parseItemToCell(mStrItem);
     digitalMerge();
 }
@@ -472,6 +473,17 @@ void Item::sortAllCell(void)
 {
     mCellList.sort(compare);
     updateFromAllCell();
+}
+
+void Item::removeOne(void)
+{
+    for(std::list<Cell*>::iterator celllist_iter = mCellList.begin(); celllist_iter!= mCellList.end(); ) {
+        Cell *curCell = (*celllist_iter);
+        if (curCell->mStrCell == "1")
+            celllist_iter = mCellList.erase(celllist_iter);
+        else
+            ++celllist_iter;
+    }
 }
 
 bool Item::operator==(Item& item)
