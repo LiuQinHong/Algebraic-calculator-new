@@ -44,24 +44,42 @@
      <x>30</x>
      <y>70</y>
      <width>930</width>
-     <height>470</height>
+     <height>400</height>
     </rect>
    </property>
    <property name="minimumSize">
     <size>
      <width>930</width>
-     <height>470</height>
+     <height>400</height>
     </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>400</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>18</pointsize>
+    </font>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>550</y>
+     <y>490</y>
      <width>930</width>
-     <height>33</height>
+     <height>50</height>
     </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>50</height>
+    </size>
    </property>
    <property name="text">
     <string>Please input Algebraic expression:</string>
@@ -71,10 +89,16 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>600</y>
-     <width>750</width>
-     <height>35</height>
+     <y>550</y>
+     <width>851</width>
+     <height>100</height>
     </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>80</height>
+    </size>
    </property>
    <property name="font">
     <font>
@@ -85,8 +109,8 @@
   <widget class="QPushButton" name="pushButton_equal">
    <property name="geometry">
     <rect>
-     <x>790</x>
-     <y>600</y>
+     <x>890</x>
+     <y>550</y>
      <width>80</width>
      <height>35</height>
     </rect>
@@ -103,8 +127,8 @@
   <widget class="QPushButton" name="pushButton_del">
    <property name="geometry">
     <rect>
-     <x>880</x>
-     <y>600</y>
+     <x>890</x>
+     <y>615</y>
      <width>80</width>
      <height>35</height>
     </rect>

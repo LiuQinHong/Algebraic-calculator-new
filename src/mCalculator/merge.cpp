@@ -279,10 +279,13 @@ void Merge::extractItemcoefAll(Item &origItem,Item &nextItem)
         qDebug() << " Enter coefFlag " ;
         //遍历Cell链表提取系数
         for(std::list<Cell*>::iterator origList_iter = origItem.mCellList.begin();
-            origList_iter!= origItem.mCellList.end();++origList_iter){
+            origList_iter!= origItem.mCellList.end();){
+            qDebug() << "(*origList_iter)->mStrCell " << (*origList_iter)->mStrCell.c_str();
+            qDebug() << "(*origList_iter)->mCellType " << (*origList_iter)->mCellType;
             if((*origList_iter)->mCellType == NUMBER || (*origList_iter)->mCellType == EXP ||
                (*origList_iter)->mCellType == PI	|| (*origList_iter)->mCellType == EXPWITHEXPONENT ||
                (*origList_iter)->mCellType == PIWITHEXPONENT){
+                qDebug() << "after orig coefStr " << coefStr.c_str();
                 coefStr.append((*origList_iter)->mStrCell);
                 coefStr.append("*");
                 if(origList_iter != origItem.mCellList.end())
@@ -291,6 +294,9 @@ void Merge::extractItemcoefAll(Item &origItem,Item &nextItem)
                     ++origList_iter;
                 coefAllFlag = true;
             }
+            else
+                 ++origList_iter;
+            qDebug() << "after orig coefStr " << coefStr.c_str();
         }
         if(!coefStr.empty())
             coefStr.pop_back();

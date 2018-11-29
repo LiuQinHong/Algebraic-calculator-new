@@ -18,19 +18,7 @@ mCalculator::mCalculator(QWidget *parent) :
         QMessageBox::information(this,"Tip","image load failed!");
     }
 
-    //绘制界面
-    /*nameLabel = new QLabel(this);
-//    numberLabel->setGeometry(400,300,400,70);
-    nameLabel->move(350,30);
-    nameLabel->setText("AL-Calculator");
-    nameLabel->setFont(QFont("黑体",26));
-    nameLabel->wordWrap();//自适应
-    nameLabel->setStyleSheet("color:black");*/
-
     ui->label_name->setAlignment(Qt::AlignHCenter);
-
-    //ui->textEdit_display->setText("<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">(a+b)<span style=\" vertical-align:super;\">(a+b)</span></p>");
-
 }
 
 mCalculator::~mCalculator()
@@ -56,7 +44,8 @@ void mCalculator::displayText(ItemList &den, ItemList &mole)
     QString outHtmlDen(transfromDen.getOutHtml()->c_str());
 
     outHtmlMole += outHtmlDen;
-
+    ui->textEdit_display->clear();
+    ui->textEdit_display->setText("Result:");
     ui->textEdit_display->append(outHtmlMole);
     ui->textEdit_display->append("<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; "
                                  "-qt-block-indent:0; text-indent:0px;\"></p>");

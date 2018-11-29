@@ -13,7 +13,11 @@ int main(int argc, char *argv[])
     w.show();
 
 
-    ItemList *itemList =  ItemList::calComplexPrefixWithNumberExponent("(a+b/c)^2");
-    itemList->printAllItem();
+    ItemList itemList("2*exp+exp^2");
+    itemList.printAllItem();
+
+    Merge merge(&itemList);
+    merge.mergeItem();
+
     return a.exec();
 }
