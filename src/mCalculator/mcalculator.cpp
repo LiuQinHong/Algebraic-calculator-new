@@ -60,9 +60,9 @@ mCalculator::mCalculator(QWidget *parent) :
     int length = mole.mExpressionStr.length()-den.mExpressionStr.length();
     qDebug() << "length = " << length;
 
-    Transform tt(den,true,length);
+    Transform tt(mole,true,length);
     tt.transform();
-    Transform tt1(mole,false);
+    Transform tt1(den,false);
     tt1.transform();
     QString QoutHtml(tt.getOutHtml()->c_str());
     QString QoutHtml1(tt1.getOutHtml()->c_str());
