@@ -376,25 +376,26 @@ void ItemList::process(std::string src,ItemList *den, ItemList *mole)
 
     Separation(src.c_str() ,denStr, moleStr);
 
-    qDebug() << "denStr = "<< denStr;
-    qDebug() << "moleStr = "<< moleStr;
-
 
     ItemList *itemListDen = ItemList::calComplexPrefixWithNumberExponent(denStr.toStdString());
-    qDebug() << "itemListDen = "<< itemListDen->mExpressionStr.c_str();
 
     ItemList *itemListMole = ItemList::calComplexPrefixWithNumberExponent(moleStr.toStdString());
-    qDebug() << "itemListMole = "<< itemListMole->mExpressionStr.c_str();
+
+
+    if (*itemListDen == *itemListMole) {
+        den->setExpressionStr("1");
+        mole->setExpressionStr("1");
+        return;
+    }
 
     itemListDen->allExponentUnFold();
     itemListMole->allExponentUnFold();
 
     ItemList::fraction(itemListDen, itemListMole);
+
     itemListDen->allExponentFold();
     itemListMole->allExponentFold();
 
-    qDebug() << "itemListDen = "<< itemListDen->mExpressionStr.c_str();
-    qDebug() << "itemListMole = "<< itemListMole->mExpressionStr.c_str();
 
     Merge merge(itemListDen);
     merge.makeItem(itemListDen);

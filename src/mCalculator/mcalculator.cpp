@@ -30,40 +30,21 @@ mCalculator::mCalculator(QWidget *parent) :
     ui->label_name->setAlignment(Qt::AlignHCenter);
 
     ui->textEdit_display->setText("<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">(a+b)<span style=\" vertical-align:super;\">(a+b)</span></p>");
-    QString den;
-    QString mole;
+    ItemList den;
+    ItemList mole;
+    ItemList::process("a*(a+b)^2/(a^(1/3)*a^(1/3))^3", &den, &mole);
+    den.processAllItemParentheses();
+    mole.processAllItemParentheses();
 
-    Separation("(exp*b+a+exp*b+pi*b+pi^2*b+a)/(exp*b+pi*b+pi^2*b)+(exp*b+a+exp*b)",den, mole);
-
-    qDebug() << "den = "<< den;
-    qDebug() << "mole = "<< mole;
-
-
-    ItemList *itemListDen = ItemList::calComplexPrefixWithNumberExponent(den.toStdString());
-    qDebug() << "itemListDen = "<< itemListDen->mExpressionStr.c_str();
-
-    ItemList *itemListMole = ItemList::calComplexPrefixWithNumberExponent(mole.toStdString());
-    qDebug() << "itemListMole = "<< itemListMole->mExpressionStr.c_str();
-
-    itemListDen->allExponentUnFold();
-    itemListMole->allExponentUnFold();
-
-    ItemList::fraction(itemListDen, itemListMole);
-    itemListDen->allExponentFold();
-    itemListMole->allExponentFold();
+    qDebug() << "main den = " << den.mExpressionStr.c_str();
+    qDebug() << "main mole = " << mole.mExpressionStr.c_str();
 
 
+    Merge merge(&den);
+    merge.makeItem(&den);
 
-    qDebug() << "itemListDen = "<< itemListDen->mExpressionStr.c_str();
-    qDebug() << "itemListMole = "<< itemListMole->mExpressionStr.c_str();
-
-    //ItemList test("exp*b+a+exp*b+pi*b+pi^2*b+a+b+b+c+c+exp+exp+c+c+pi");
-
-    Merge merge(itemListMole);
-    merge.makeItem(itemListMole);
-
-    Merge merge1(itemListDen);
-    merge1.makeItem(itemListDen);
+    Merge merge1(&mole);
+    merge1.makeItem(&mole);
 
 
     //itemListMole->printAllItem();
@@ -71,9 +52,9 @@ mCalculator::mCalculator(QWidget *parent) :
     /*ItemList *test = new ItemList("b^(c+d)+(a+b)^(a+b)");
     test->printAllItem();*/
 
-    Transform tt(*itemListDen,true);
+    Transform tt(mole,true);
     tt.transform();
-    Transform tt1(*itemListMole,false);
+    Transform tt1(den,false);
     tt1.transform();
     QString QoutHtml(tt.getOutHtml()->c_str());
     QString QoutHtml1(tt1.getOutHtml()->c_str());

@@ -19,6 +19,7 @@ Item::Item(const std::string& strItem)
         mType = MIX;
 
     parseItemToCell(mStrItem);
+    digitalMerge();
 }
 
 

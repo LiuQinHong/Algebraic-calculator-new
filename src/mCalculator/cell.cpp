@@ -541,7 +541,11 @@ void Cell::setExponent(std::string strExponent)
 
 void Cell::setExponentPrefix(std::string strExponentPrefix)
 {
-    mStrCell = "(" + strExponentPrefix + ")" + "^(" + getExponent() + ")";
+    if (isSimple(strExponentPrefix)) {
+        mStrCell = strExponentPrefix + "^(" + getExponent() + ")";
+    }
+    else
+        mStrCell = "(" + strExponentPrefix + ")" + "^(" + getExponent() + ")";
 }
 
 
