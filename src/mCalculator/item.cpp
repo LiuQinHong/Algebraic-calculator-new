@@ -463,6 +463,17 @@ void Item::separateAllCellExponent(void)
     updateFromAllCell();
 }
 
+
+static bool compare(const Cell* t1,const Cell* t2){
+    return t1->mCellType < t2->mCellType;
+}
+
+void Item::sortAllCell(void)
+{
+    mCellList.sort(compare);
+    updateFromAllCell();
+}
+
 bool Item::operator==(Item& item)
 {
     size_t size = 0;

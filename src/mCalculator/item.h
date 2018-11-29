@@ -64,6 +64,8 @@ public:
     void processAllCellParentheses(void);
     void separateAllCellExponent(void);
 
+    void sortAllCell(void);
+
     bool operator==(Item& item);
 
 };

@@ -44,12 +44,14 @@ public:
 
     static ItemList *calComplexPrefixWithNumberExponent(std::string expressionStr);
     static void fraction(ItemList *den, ItemList *mole);
-    static void process(std::string src,ItemList *den, ItemList *mole);
+    static int process(std::string src,ItemList *den, ItemList *mole);
 
     static void separate(ItemList *den, ItemList *mole);
 
     std::string getCommonFactor();
     void removeCommonFactor(std::string strCommonFactor);
+
+    void sortAllItem(void);
 
     bool operator==(ItemList& itemList);
 };

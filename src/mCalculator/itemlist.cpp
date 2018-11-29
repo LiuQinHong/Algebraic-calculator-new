@@ -55,6 +55,7 @@ ItemList::ItemList(const std::string &str)
 
     /* cell 模块种可能会添加括号，所以需要更新信息 */
     updateFromAllItem();
+    sortAllItem();
 }
 
 void ItemList::setExpressionStr(const std::string &str)
@@ -207,13 +208,13 @@ void ItemList::digitalMergeAllItem(void)
 
 void ItemList::printAllItem(void)
 {
-    //std::cout << "==========printAllItem start==========" << std::endl;
+    std::cout << "==========printAllItem start==========" << std::endl;
     std::cout << "mExpressionStr = " << mExpressionStr << std::endl;
     for(std::list<Item*>::iterator itemlist_iter = mItemList.begin(); itemlist_iter!= mItemList.end(); ++itemlist_iter) {
         std::cout << "mStrItem = " <<(*itemlist_iter)->mStrItem << std::endl;
-        //(*itemlist_iter)->printAllCell();
+        (*itemlist_iter)->printAllCell();
     }
-    //std::cout << "==========printAllItem end==========" << std::endl;
+    std::cout << "==========printAllItem end==========" << std::endl;
 }
 
 
@@ -367,6 +368,17 @@ void ItemList::removeCommonFactor(std::string strCommonFactor)
     updateFromAllItem();
 }
 
+
+void ItemList::sortAllItem(void)
+{
+    for(std::list<Item*>::iterator itemlist_iter = mItemList.begin(); itemlist_iter!= mItemList.end(); ++itemlist_iter) {
+        Item *itemCur = (*itemlist_iter);
+        itemCur->sortAllCell();
+    }
+
+    updateFromAllItem();
+}
+
 /* den : +a*b*c*exp*(a+b)^(c+d) + a^3*(exp^a+b)^(c+d)*exp*b*(a+b)^(d) + a^(b+c)*(a+b)^(e) */
 /* mole : -a*d*b*exp + a*(a + exp^b)^(c+d)*b*exp */
 void ItemList::fraction(ItemList *den, ItemList *mole)
@@ -384,18 +396,21 @@ void ItemList::fraction(ItemList *den, ItemList *mole)
     mole->removeCommonFactor(itemList.getCommonFactor());
 }
 
-void ItemList::process(std::string src,ItemList *den, ItemList *mole)
+int ItemList::process(std::string src,ItemList *den, ItemList *mole)
 {
     QString denStr;
     QString moleStr;
+    int iRet;
 
     if (src.empty())
-        return;
+        return -1;
 
     if (src.at(0) == '+' || src.at(0) == '-')
         src = src.substr(1);
 
-    Separation(src.c_str() ,denStr, moleStr);
+    iRet = Separation(src.c_str() ,denStr, moleStr);
+    if (iRet < 0)
+        return -1;
 
     ItemList *itemListDen = ItemList::calComplexPrefixWithNumberExponent(denStr.toStdString());
     ItemList *itemListMole = ItemList::calComplexPrefixWithNumberExponent(moleStr.toStdString());
@@ -405,7 +420,7 @@ void ItemList::process(std::string src,ItemList *den, ItemList *mole)
     if (*itemListDen == *itemListMole) {
         den->setExpressionStr("1");
         mole->setExpressionStr("1");
-        return;
+        return 0;
     }
 
     itemListDen->allExponentUnFold();
@@ -432,6 +447,7 @@ void ItemList::process(std::string src,ItemList *den, ItemList *mole)
 
     *den = *itemListDen;
     *mole = *itemListMole;
+    return 0;
 }
 
 void ItemList::separate(ItemList *den, ItemList *mole)
@@ -477,13 +493,14 @@ void ItemList::separate(ItemList *den, ItemList *mole)
 
     mole->setExpressionStr(itemListResultMole_mole.mExpressionStr);
 
-
+    mole->sortAllItem();
     ItemList itemListResultDen_den;
     ItemList itemListResultDen_mole;
 
     ItemList::process(resultDen, &itemListResultDen_den, &itemListResultDen_mole);
 
     den->setExpressionStr(itemListResultDen_mole.mExpressionStr);
+    den->sortAllItem();
 }
 
 bool ItemList::operator==(ItemList& itemList)
