@@ -30,30 +30,7 @@ mCalculator::mCalculator(QWidget *parent) :
     ui->label_name->setAlignment(Qt::AlignHCenter);
 
     //ui->textEdit_display->setText("<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">(a+b)<span style=\" vertical-align:super;\">(a+b)</span></p>");
-    ItemList den;
-    ItemList mole;
-    ItemList::process("(((a+b)^2/b)^c + g*h/a)/(d/e)^f", &den, &mole);
 
-    qDebug() << "den = " << den.mExpressionStr.c_str();
-    qDebug() << "mole = " << mole.mExpressionStr.c_str();
-
-    ItemList::separate(&den, &mole);
-
-    qDebug() << "mCalculator ========= den = " << den.mExpressionStr.c_str();
-    qDebug() << "mCalculator ========= mole = " << mole.mExpressionStr.c_str();
-
-    den.factor();
-    mole.factor();
-
-    Merge merge(&den);
-    merge.makeItem(&den);
-    Merge merge1(&mole);
-    merge1.makeItem(&mole);
-
-    qDebug() << "mCalculator ========= den = " << den.mExpressionStr.c_str();
-    qDebug() << "mCalculator ========= mole = " << mole.mExpressionStr.c_str();
-
-    displayText(den, mole);
 }
 
 mCalculator::~mCalculator()
@@ -88,6 +65,34 @@ void mCalculator::displayText(ItemList &den, ItemList &mole)
 void mCalculator::on_pushButton_equal_clicked()
 {
     inputExpression = ui->textEdit_input->toPlainText();
+
+    if (inputExpression.isEmpty())
+        return;
+
+    ItemList den;
+    ItemList mole;
+    ItemList::process(inputExpression.toStdString(), &den, &mole);
+
+    qDebug() << "den = " << den.mExpressionStr.c_str();
+    qDebug() << "mole = " << mole.mExpressionStr.c_str();
+
+    ItemList::separate(&den, &mole);
+
+    qDebug() << "mCalculator ========= den = " << den.mExpressionStr.c_str();
+    qDebug() << "mCalculator ========= mole = " << mole.mExpressionStr.c_str();
+
+    den.factor();
+    mole.factor();
+
+    Merge merge(&den);
+    merge.makeItem(&den);
+    Merge merge1(&mole);
+    merge1.makeItem(&mole);
+
+    qDebug() << "mCalculator ========= den = " << den.mExpressionStr.c_str();
+    qDebug() << "mCalculator ========= mole = " << mole.mExpressionStr.c_str();
+
+    displayText(den, mole);
 }
 
 void mCalculator::on_pushButton_del_clicked()

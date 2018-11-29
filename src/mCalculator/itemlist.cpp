@@ -446,6 +446,7 @@ int ItemList::process(std::string src,ItemList *den, ItemList *mole)
         return -1;
 
 
+
     ItemList *itemListDen = ItemList::calComplexPrefixWithNumberExponent(denStr.toStdString());
     ItemList *itemListMole = ItemList::calComplexPrefixWithNumberExponent(moleStr.toStdString());
 
