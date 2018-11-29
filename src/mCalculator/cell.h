@@ -79,6 +79,7 @@ public:
     void calExponent(void);
 
     void processParentheses(void);
+    void separateExponent(void);
 
     void addParentheses(void);
 

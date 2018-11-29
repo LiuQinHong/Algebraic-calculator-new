@@ -32,20 +32,23 @@ mCalculator::mCalculator(QWidget *parent) :
     ui->textEdit_display->setText("<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">(a+b)<span style=\" vertical-align:super;\">(a+b)</span></p>");
     ItemList den;
     ItemList mole;
-    ItemList::process("a*(a+b)^2/(a^(1/3)*a^(1/3))^3+a/b", &den, &mole);
-    den.processAllItemParentheses();
-    mole.processAllItemParentheses();
+    ItemList::process("((a+b)^2/b)^c/(d/e)^f + g*h/a", &den, &mole);
 
-    qDebug() << "main den = " << den.mExpressionStr.c_str();
-    qDebug() << "main mole = " << mole.mExpressionStr.c_str();
+    qDebug() << "den = " << den.mExpressionStr.c_str();
+    qDebug() << "mole = " << mole.mExpressionStr.c_str();
 
+    ItemList::separate(&den, &mole);
+
+    qDebug() << "mCalculator ========= den = " << den.mExpressionStr.c_str();
+    qDebug() << "mCalculator ========= mole = " << mole.mExpressionStr.c_str();
 
     Merge merge(&den);
     merge.makeItem(&den);
-
     Merge merge1(&mole);
     merge1.makeItem(&mole);
 
+    qDebug() << "mCalculator ========= den = " << den.mExpressionStr.c_str();
+    qDebug() << "mCalculator ========= mole = " << mole.mExpressionStr.c_str();
 
     //itemListMole->printAllItem();
 

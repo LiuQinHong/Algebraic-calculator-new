@@ -454,6 +454,15 @@ void Item::processAllCellParentheses(void)
     updateFromAllCell();
 }
 
+void Item::separateAllCellExponent(void)
+{
+    for(std::list<Cell*>::iterator celllist_iter = mCellList.begin(); celllist_iter!= mCellList.end(); ++celllist_iter) {
+        (*celllist_iter)->separateExponent();
+    }
+
+    updateFromAllCell();
+}
+
 bool Item::operator==(Item& item)
 {
     size_t size = 0;

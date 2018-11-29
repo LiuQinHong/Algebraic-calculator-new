@@ -688,11 +688,25 @@ void Cell::processParentheses(void)
     ItemList itemListMole;
     ItemList::process(strExponent, &itemListDen, &itemListMole);
 
+
     if (itemListDen.mExpressionStr.substr(1) == "1") {
         strExponent = itemListMole.mExpressionStr.substr(1);
     }
     else {
-        strExponent = itemListMole.mExpressionStr.substr(1) + "/" + itemListDen.mExpressionStr.substr(1);
+        std::string tmpMole;
+        std::string tmpDen;
+
+        if (isSimple(itemListMole.mExpressionStr.substr(1)))
+            tmpMole = itemListMole.mExpressionStr.substr(1);
+        else
+            tmpMole = "(" + itemListMole.mExpressionStr.substr(1) + ")";
+
+        if (isSimple(itemListDen.mExpressionStr.substr(1)))
+            tmpDen = itemListDen.mExpressionStr.substr(1);
+        else
+            tmpDen = "(" + itemListDen.mExpressionStr.substr(1) + ")";
+
+        strExponent = tmpMole + "/" + tmpDen;
     }
 
     setExponent(strExponent);
@@ -709,10 +723,45 @@ void Cell::processParentheses(void)
         strExponentPrefix = itemListMole.mExpressionStr.substr(1);
     }
     else {
-        strExponentPrefix = itemListMole.mExpressionStr.substr(1) + "/" + itemListDen.mExpressionStr.substr(1); ;
+        std::string tmpMole;
+        std::string tmpDen;
+        if (isSimple(itemListMole.mExpressionStr.substr(1)))
+            tmpMole = itemListMole.mExpressionStr.substr(1);
+        else
+            tmpMole = "(" + itemListMole.mExpressionStr.substr(1) + ")";
+
+        if (isSimple(itemListDen.mExpressionStr.substr(1)))
+            tmpDen = itemListDen.mExpressionStr.substr(1);
+        else
+            tmpDen = "(" + itemListDen.mExpressionStr.substr(1) + ")";
+
+
+        strExponentPrefix = tmpMole + "/" + tmpDen;
     }
 
     setExponentPrefix(strExponentPrefix);
+}
+
+/* ((a*b+c)/(d+e))^(a+b)  */
+void Cell::separateExponent(void)
+{
+    std::string strExponent = getExponent();
+    std::string strExponentPrefix = getExponentPrefix();
+
+    if (strExponent.empty() || strExponentPrefix.empty())
+        return;
+
+    int iPos = strExponentPrefix.find("/");
+    if (iPos < 0)
+        return;
+
+    std::string strExponentPrefixLeft = strExponentPrefix.substr(1, iPos - 1) + "^(" + strExponent + ")";
+    std::string strExponentPrefixRight = strExponentPrefix.substr(iPos + 1);
+    strExponentPrefixRight.pop_back();
+    strExponentPrefixRight +=  + "^(" + strExponent + ")";
+
+    mStrCell = strExponentPrefixLeft + "/" + strExponentPrefixRight;
+    updateCellType();
 }
 
 

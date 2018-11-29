@@ -207,13 +207,13 @@ void ItemList::digitalMergeAllItem(void)
 
 void ItemList::printAllItem(void)
 {
-    std::cout << "==========printAllItem start==========" << std::endl;
+    //std::cout << "==========printAllItem start==========" << std::endl;
     std::cout << "mExpressionStr = " << mExpressionStr << std::endl;
     for(std::list<Item*>::iterator itemlist_iter = mItemList.begin(); itemlist_iter!= mItemList.end(); ++itemlist_iter) {
         std::cout << "mStrItem = " <<(*itemlist_iter)->mStrItem << std::endl;
-        (*itemlist_iter)->printAllCell();
+        //(*itemlist_iter)->printAllCell();
     }
-    std::cout << "==========printAllItem end==========" << std::endl;
+    //std::cout << "==========printAllItem end==========" << std::endl;
 }
 
 
@@ -225,6 +225,28 @@ void ItemList::processAllItemParentheses(void)
 
     updateFromAllItem();
 }
+
+void ItemList::separateAllItemExponent(void)
+{
+    for(std::list<Item*>::iterator itemlist_iter = mItemList.begin(); itemlist_iter!= mItemList.end(); ++itemlist_iter) {
+        (*itemlist_iter)->separateAllCellExponent();
+    }
+
+    updateFromAllItem();
+
+}
+
+std::string ItemList::getMole(void)
+{
+
+}
+
+std::string ItemList::getDen(void)
+{
+
+}
+
+
 
 void ItemList::updateFromAllItem(void)
 {
@@ -355,7 +377,6 @@ void ItemList::fraction(ItemList *den, ItemList *mole)
     std::string denCommonFactor = den->getCommonFactor();
     std::string moleCommonFactor = mole->getCommonFactor();
     ItemList itemList(denCommonFactor + "+" + moleCommonFactor);
-
     if (denCommonFactor.empty() || moleCommonFactor.empty())
         return;
 
@@ -376,10 +397,9 @@ void ItemList::process(std::string src,ItemList *den, ItemList *mole)
 
     Separation(src.c_str() ,denStr, moleStr);
 
-
     ItemList *itemListDen = ItemList::calComplexPrefixWithNumberExponent(denStr.toStdString());
-
     ItemList *itemListMole = ItemList::calComplexPrefixWithNumberExponent(moleStr.toStdString());
+
 
 
     if (*itemListDen == *itemListMole) {
@@ -391,23 +411,80 @@ void ItemList::process(std::string src,ItemList *den, ItemList *mole)
     itemListDen->allExponentUnFold();
     itemListMole->allExponentUnFold();
 
+
     ItemList::fraction(itemListDen, itemListMole);
 
     itemListDen->allExponentFold();
     itemListMole->allExponentFold();
 
+    itemListDen->setExpressionStr(itemListDen->mExpressionStr);
+    itemListMole->setExpressionStr(itemListMole->mExpressionStr);
 
     Merge merge(itemListDen);
     merge.makeItem(itemListDen);
     merge.makeItem(itemListMole);
 
-    itemListDen->printAllItem();
-    itemListMole->printAllItem();
+
+    itemListDen->processAllItemParentheses();
+    itemListMole->processAllItemParentheses();
+
+
+
     *den = *itemListDen;
     *mole = *itemListMole;
 }
 
+void ItemList::separate(ItemList *den, ItemList *mole)
+{
+    if (!den || !mole)
+        return;
 
+
+    qDebug() << "separate den start= " << den->mExpressionStr.c_str();
+    qDebug() << "separate mole  start= " << mole->mExpressionStr.c_str();
+
+    den->separateAllItemExponent();
+    mole->separateAllItemExponent();
+
+    qDebug() << "separate den end= " << den->mExpressionStr.c_str();
+    qDebug() << "separate mole end= " << mole->mExpressionStr.c_str();
+
+    ItemList itemListDen_den;
+    ItemList itemListDen_mole;
+    ItemList::process(den->mExpressionStr, &itemListDen_den, &itemListDen_mole);
+
+    ItemList itemListMole_den;
+    ItemList itemListMole_mole;
+    ItemList::process(mole->mExpressionStr, &itemListMole_den, &itemListMole_mole);
+
+
+    qDebug() << "itemListDen_den = " << itemListDen_den.mExpressionStr.c_str();
+    qDebug() << "itemListDen_mole = " << itemListDen_mole.mExpressionStr.c_str();
+
+    qDebug() << "itemListMole_den = " << itemListMole_den.mExpressionStr.c_str();
+    qDebug() << "itemListMole_mole = " << itemListMole_mole.mExpressionStr.c_str();
+
+    std::string resultMole = "(" + itemListDen_den.mExpressionStr.substr(1) + ")" + "*" + "(" + itemListMole_mole.mExpressionStr.substr(1) + ")";
+    std::string resultDen = "(" + itemListDen_mole.mExpressionStr.substr(1) + ")" + "*" + "(" + itemListMole_den.mExpressionStr.substr(1) + ")";
+
+    qDebug() << "resultMole = " << resultMole.c_str();
+    qDebug() << "resultDen = " << resultDen.c_str();
+
+    ItemList itemListResultMole_den;
+    ItemList itemListResultMole_mole;
+
+    ItemList::process(resultMole, &itemListResultMole_den, &itemListResultMole_mole);
+
+    mole->setExpressionStr(itemListResultMole_mole.mExpressionStr);
+
+
+    ItemList itemListResultDen_den;
+    ItemList itemListResultDen_mole;
+
+    ItemList::process(resultDen, &itemListResultDen_den, &itemListResultDen_mole);
+
+    den->setExpressionStr(itemListResultDen_mole.mExpressionStr);
+}
 
 bool ItemList::operator==(ItemList& itemList)
 {

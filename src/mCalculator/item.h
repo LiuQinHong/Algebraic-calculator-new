@@ -62,6 +62,7 @@ public:
     void printAllCell(void);
 
     void processAllCellParentheses(void);
+    void separateAllCellExponent(void);
 
     bool operator==(Item& item);
 
