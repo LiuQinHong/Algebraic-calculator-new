@@ -57,6 +57,8 @@ public:
 
     void transformItem(Item &item);
 
+    void format();
+
     std::string *getOutHtml();
 
 private:
@@ -71,6 +73,7 @@ private:
     std::string *outHtml;
     ItemList &transItemList;
     bool denominatorFlag;
+    bool nbspFlag;
     int itemCount;
     int mlength;
 

@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QTextEdit>
 #include <QMessageBox>
+#include <itemlist.h>
 
 
 namespace Ui {
@@ -20,8 +21,12 @@ class mCalculator : public QWidget
 
 public:
     explicit mCalculator(QWidget *parent = 0);
+
     ~mCalculator();
+
     void paintEvent(QPaintEvent *event);
+
+    void displayText(ItemList &den,ItemList &mole);
 
 private slots:
     void on_pushButton_equal_clicked();

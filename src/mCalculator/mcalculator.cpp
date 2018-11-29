@@ -32,7 +32,7 @@ mCalculator::mCalculator(QWidget *parent) :
     ui->textEdit_display->setText("<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">(a+b)<span style=\" vertical-align:super;\">(a+b)</span></p>");
     ItemList den;
     ItemList mole;
-    ItemList::process("((a+b)^2/b)^c/(d/e)^f + g*h/a", &den, &mole);
+    ItemList::process("(((a+b)^2/b)^c + g*h/a)/(d/e)^f", &den, &mole);
 
     qDebug() << "den = " << den.mExpressionStr.c_str();
     qDebug() << "mole = " << mole.mExpressionStr.c_str();
@@ -57,18 +57,9 @@ mCalculator::mCalculator(QWidget *parent) :
     merge2.makeItem(test);*/
 
 
-    int length = mole.mExpressionStr.length()-den.mExpressionStr.length();
-    qDebug() << "length = " << length;
 
-    Transform tt(mole,true,length);
-    tt.transform();
-    Transform tt1(den,false);
-    tt1.transform();
-    QString QoutHtml(tt.getOutHtml()->c_str());
-    QString QoutHtml1(tt1.getOutHtml()->c_str());
-    QoutHtml += QoutHtml1;
+    displayText(den,mole);
 
-    ui->textEdit_display->setText(QoutHtml);
 }
 
 mCalculator::~mCalculator()
@@ -79,6 +70,21 @@ mCalculator::~mCalculator()
 void mCalculator::paintEvent(QPaintEvent *event){
     QPainter painter(this);
     painter.drawImage(0,0,image);
+}
+
+void mCalculator::displayText(ItemList &den, ItemList &mole)
+{
+    int length = den.mExpressionStr.length() - mole.mExpressionStr.length();
+    qDebug() << "length = " << length;
+    Transform tt(mole,true,length);
+    tt.transform();
+    Transform tt1(den,false,length);
+    tt1.transform();
+    QString QoutHtml(tt.getOutHtml()->c_str());
+    QString QoutHtml1(tt1.getOutHtml()->c_str());
+    QoutHtml += QoutHtml1;
+
+    ui->textEdit_display->setText(QoutHtml);
 }
 
 void mCalculator::on_pushButton_equal_clicked()

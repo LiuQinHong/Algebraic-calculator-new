@@ -9,10 +9,15 @@
 Transform::Transform(ItemList &itemList, bool denominatorFlag,int length):transItemList(itemList),denominatorFlag(denominatorFlag){
     itemCount = itemList.mItemList.size();
     outHtml = new std::string;
-    if(length < 0)
-        mlength = 0;
-    else
+
+    if(length <= 0){
+        mlength = -length;
+        nbspFlag = false;
+    }
+    else{
         mlength = length;
+        nbspFlag = true;
+    }
 }
 
 Transform::~Transform()
@@ -367,31 +372,11 @@ bool Transform::transform()
 {
     bool res;
     *outHtml += pStart;
-    qDebug() << "mlength = " << mlength;
-    for(int i = 0;i < (mlength/4-1);i++){
-        if(i == 0){
-            *outHtml += spanStart;
-            *outHtml += underLine;
-            *outHtml += spanMid;
-        }
-        qDebug() << "mlength = " << mlength;
-        outHtml->append("&nbsp;");
-        if(i+1 == (mlength/4-1))
-            *outHtml += spanEnd;
-    }
+    format();
     res = transforms(transItemList);
-    for(int i = 0;i < (mlength/4-1);i++){
-        if(i == 0){
-            *outHtml += spanStart;
-            *outHtml += underLine;
-            *outHtml += spanMid;
-        }
-        *outHtml += "&nbsp;";
-        if(i+1 == (mlength/4-1))
-            *outHtml += spanEnd;
-    }
+    format();
     *outHtml += pEnd;
-    qDebug() << "outHtml = " << outHtml->c_str();
+    //qDebug() << "outHtml = " << outHtml->c_str();
     return res;
 }
 
@@ -482,6 +467,31 @@ void Transform::transformItem(Item &item)
             break;
         default:
             break;
+        }
+    }
+}
+
+void Transform::format()
+{
+    qDebug() << "nbspFlag = " << nbspFlag;
+    if(nbspFlag && denominatorFlag){
+        qDebug() << "mlength = " << mlength;
+        for(int i = 0;i < (mlength/4);i++){
+            if(i == 0){
+                *outHtml += spanStart;
+                *outHtml += underLine;
+                *outHtml += spanMid;
+            }
+            qDebug() << "mlength = " << mlength;
+            outHtml->append("&nbsp;");
+            if(i+1 == (mlength/4))
+                *outHtml += spanEnd;
+        }
+    }
+    else if(!denominatorFlag && !nbspFlag){
+        for(int i = 0;i < (mlength/4);i++){
+            //qDebug() << "fenmu = " << mlength;
+            outHtml->append("&nbsp;");
         }
     }
 }
