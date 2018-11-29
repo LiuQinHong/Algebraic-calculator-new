@@ -390,7 +390,7 @@ void ItemList::factor(void)
     tmpItemList.removeOne();
 
 
-    if (tmpItemList.mExpressionStr.empty())
+    if (tmpItemList.mExpressionStr.empty() || tmpItemList.mExpressionStr == "+1" )
         mExpressionStr = strCommonFactor;
     else
         mExpressionStr = strCommonFactor + "*(" + tmpItemList.mExpressionStr + ")";

@@ -392,6 +392,8 @@ void Item::digitalMerge(void)
     int iSum = 1;
     int iNum = 1;
 
+
+
     for(std::list<Cell*>::iterator celllist_iter = mCellList.begin(); celllist_iter!= mCellList.end(); ++celllist_iter) {
         if ((*celllist_iter)->mCellType == NUMBER) {
             std::stringstream strStream;
@@ -415,6 +417,7 @@ void Item::digitalMerge(void)
     delAllCell();
     mStrItem = tmpStr;
     parseItemToCell(mStrItem);
+    removeOne();
 }
 
 void Item::updateFromAllCell(void)
@@ -477,6 +480,9 @@ void Item::sortAllCell(void)
 
 void Item::removeOne(void)
 {
+    if (mStrItem == "+1")
+        return;
+
     for(std::list<Cell*>::iterator celllist_iter = mCellList.begin(); celllist_iter!= mCellList.end(); ) {
         Cell *curCell = (*celllist_iter);
         if (curCell->mStrCell == "1")
