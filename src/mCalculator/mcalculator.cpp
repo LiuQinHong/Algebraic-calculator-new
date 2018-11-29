@@ -32,7 +32,7 @@ mCalculator::mCalculator(QWidget *parent) :
     ui->textEdit_display->setText("<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">(a+b)<span style=\" vertical-align:super;\">(a+b)</span></p>");
     ItemList den;
     ItemList mole;
-    ItemList::process("a*(a+b)^2/(a^(1/3)*a^(1/3))^3", &den, &mole);
+    ItemList::process("a*(a+b)^2/(a^(1/3)*a^(1/3))^3+a/b", &den, &mole);
     den.processAllItemParentheses();
     mole.processAllItemParentheses();
 
@@ -49,12 +49,17 @@ mCalculator::mCalculator(QWidget *parent) :
 
     //itemListMole->printAllItem();
 
-    /*ItemList *test = new ItemList("b^(c+d)+(a+b)^(a+b)");
-    test->printAllItem();*/
+    /*ItemList *test = new ItemList("+1+a");
+    Merge merge2(test);
+    merge2.makeItem(test);*/
 
-    Transform tt(mole,true);
+
+    int length = mole.mExpressionStr.length()-den.mExpressionStr.length();
+    qDebug() << "length = " << length;
+
+    Transform tt(den,true,length);
     tt.transform();
-    Transform tt1(den,false);
+    Transform tt1(mole,false);
     tt1.transform();
     QString QoutHtml(tt.getOutHtml()->c_str());
     QString QoutHtml1(tt1.getOutHtml()->c_str());

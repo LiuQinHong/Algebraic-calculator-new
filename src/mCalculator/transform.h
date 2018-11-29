@@ -17,7 +17,7 @@ class Transform : public QObject
     Q_OBJECT
 
 public:
-    Transform(ItemList &itemList,bool denominatorFlag);
+    Transform(ItemList &itemList,bool denominatorFlag,int length = 0);
 
     ~Transform();
 
@@ -72,6 +72,7 @@ private:
     ItemList &transItemList;
     bool denominatorFlag;
     int itemCount;
+    int mlength;
 
 };
 

@@ -6,9 +6,13 @@
 #include <transform.h>
 #include <qdebug.h>
 
-Transform::Transform(ItemList &itemList, bool denominatorFlag):transItemList(itemList),denominatorFlag(denominatorFlag){
+Transform::Transform(ItemList &itemList, bool denominatorFlag,int length):transItemList(itemList),denominatorFlag(denominatorFlag){
     itemCount = itemList.mItemList.size();
     outHtml = new std::string;
+    if(length < 0)
+        mlength = 0;
+    else
+        mlength = length;
 }
 
 Transform::~Transform()
@@ -307,16 +311,23 @@ bool Transform::toComplexList(Cell &cell)
 
 void Transform::toComplexListSuper(Cell &cell)
 {
-    if(cell.getExponent() == "1/2"){
+    std::string str = cell.getExponent();
+    if(str == "1/2"){
         *outHtml += "√";
     }
     //获得幂
-     if(cell.getExponent() != "1/2"){
+     if(str != "1/2"){
         *outHtml += spanStart;
         *outHtml += super;
-        *outHtml += underLine;
+        //*outHtml += underLine;
         *outHtml += spanMid;
-        *outHtml += cell.getExponent();//幂
+         int addFlag = str.find("+");
+         int delFlag = str.find("-");
+         if((addFlag >= 0) || (delFlag >= 0)){
+             str.insert(0,1,'(');
+             str.push_back(')');
+         }
+        *outHtml += str;//幂
         *outHtml += spanEnd;
      }
 }
@@ -356,8 +367,31 @@ bool Transform::transform()
 {
     bool res;
     *outHtml += pStart;
+    qDebug() << "mlength = " << mlength;
+    for(int i = 0;i < (mlength/4-1);i++){
+        if(i == 0){
+            *outHtml += spanStart;
+            *outHtml += underLine;
+            *outHtml += spanMid;
+        }
+        qDebug() << "mlength = " << mlength;
+        outHtml->append("&nbsp;");
+        if(i+1 == (mlength/4-1))
+            *outHtml += spanEnd;
+    }
     res = transforms(transItemList);
+    for(int i = 0;i < (mlength/4-1);i++){
+        if(i == 0){
+            *outHtml += spanStart;
+            *outHtml += underLine;
+            *outHtml += spanMid;
+        }
+        *outHtml += "&nbsp;";
+        if(i+1 == (mlength/4-1))
+            *outHtml += spanEnd;
+    }
     *outHtml += pEnd;
+    qDebug() << "outHtml = " << outHtml->c_str();
     return res;
 }
 
