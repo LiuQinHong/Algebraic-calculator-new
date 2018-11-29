@@ -182,15 +182,17 @@ void Transform::toUnderSub(Cell &cell)
 
 void Transform::toSubSuper(Cell &cell)
 {
+    //获得前缀
+
     if(cell.getExponent() == "1/2")
         *outHtml += "√";
     //获得前缀
     if(cell.mCellType == NUMBERMIXALPHASUBSCRIPTWITHEXPONENT)
         *outHtml += cell.getExponentPrefix().at(0);
     else if(cell.mCellType == NUMBERMIXPISUBSCRIPTWITHEXPONENT)
-        *outHtml += "π";
-    else
         *outHtml += "e";
+    else
+        *outHtml += "π";
     //获得下标
     *outHtml += spanStart;
     *outHtml += sub;
@@ -198,24 +200,13 @@ void Transform::toSubSuper(Cell &cell)
     *outHtml += cell.getSubscript();//下标
     *outHtml += spanEnd;
     //获得幂
-    *outHtml += cell.getExponentPrefix();
     if(cell.getExponent() != "1/2"){
-        //获得幂
-        *outHtml += spanStart;
-        *outHtml += super;
-        *outHtml += spanMid;
-        *outHtml += cell.getExponent();//幂
-        *outHtml += spanEnd;
+       *outHtml += spanStart;
+       *outHtml += super;
+       *outHtml += spanMid;
+       *outHtml += cell.getExponent();//幂
+       *outHtml += spanEnd;
     }
-}
-
-void Transform::toUnderline(Cell &cell)
-{
-    *outHtml += spanStart;
-    *outHtml += underLine;
-    *outHtml += spanMid;
-    *outHtml += cell.mStrCell;
-    *outHtml += spanEnd;
 }
 
 void Transform::toUnderSubsuper(Cell &cell)
@@ -251,6 +242,17 @@ void Transform::toUnderSubsuper(Cell &cell)
        *outHtml += spanEnd;
     }
 }
+
+void Transform::toUnderline(Cell &cell)
+{
+    *outHtml += spanStart;
+    *outHtml += underLine;
+    *outHtml += spanMid;
+    *outHtml += cell.mStrCell;
+    *outHtml += spanEnd;
+}
+
+
 
 bool Transform::toComplexListUnder(Cell &cell)
 {
