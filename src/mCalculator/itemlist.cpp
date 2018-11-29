@@ -293,20 +293,19 @@ void ItemList::allExponentFold(void)
 
 ItemList *ItemList::calComplexPrefixWithNumberExponent(std::string expressionStr)
 {
+#if 1
     QString den;
     QString mole;
     ItemList *itemListOrg = new ItemList(expressionStr);
-    itemListOrg->printAllItem();
 
     itemListOrg->allExponentUnFold();
 
-    itemListOrg->printAllItem();
 
     Separation(itemListOrg->mExpressionStr.c_str()+1, den, mole);
     delete itemListOrg;
 
-    qDebug() << "============ den ====" << den;
-    qDebug() << "============ mole ====" << mole;
+    //qDebug() << "============ den ====" << den;
+    //qDebug() << "============ mole ====" << mole;
 
     std::string str;
 
@@ -327,14 +326,33 @@ ItemList *ItemList::calComplexPrefixWithNumberExponent(std::string expressionStr
         itemListRet = new ItemList(str);
     }
 
-    qDebug() << "============ str ====" << str.c_str();
+    //qDebug() << "============ str ====" << str.c_str();
     itemListRet->allExponentFold();
 
     Merge merge(itemListRet);
     merge.mergeItem();
 
     return itemListRet;
+#else
+    QString den;
+    QString mole;
+    ItemList *itemListOrg = new ItemList(expressionStr);
+    itemListOrg->printAllItem();
 
+    itemListOrg->allExponentUnFold();
+
+
+    Separation(itemListOrg->mExpressionStr.c_str()+1, den, mole);
+    delete itemListOrg;
+
+    ItemList *itemListRet = new ItemList(mole.toStdString());
+    itemListRet->allExponentFold();
+
+    Merge merge(itemListRet);
+    merge.mergeItem();
+
+    return itemListRet;
+#endif
 }
 
 std::string ItemList::getCommonFactor()
@@ -460,6 +478,8 @@ int ItemList::process(std::string src,ItemList *den, ItemList *mole)
     QString denStr;
     QString moleStr;
     int iRet;
+    int iFlag = 0;
+    int iPos;
 
     if (src.empty())
         return -1;
@@ -476,13 +496,23 @@ int ItemList::process(std::string src,ItemList *den, ItemList *mole)
     ItemList *itemListDen = ItemList::calComplexPrefixWithNumberExponent(denStr.toStdString());
     ItemList *itemListMole = ItemList::calComplexPrefixWithNumberExponent(moleStr.toStdString());
 
-    qDebug() << "strMoleLeftstrMoleLeftstrMoleLeftstrMoleLeft = " ;
-    qDebug() << "strDenLeftstrDenLeftstrDenLeftstrDenLeftstrDenLeft = " ;
-
 
     std::string strDenLeft;
     std::string strDenRight;
-    int iPos = itemListDen->mExpressionStr.find("/");
+    iPos = -1;
+    iFlag = 0;
+    qDebug() << "itemListDen->mExpressionStr = " << itemListDen->mExpressionStr.c_str();
+    for (size_t i = 0; i < itemListDen->mExpressionStr.size(); i++) {
+        if (itemListDen->mExpressionStr.at(i) == '(')
+            iFlag++;
+
+        if (itemListDen->mExpressionStr.at(i) == ')')
+            iFlag--;
+
+        if (itemListDen->mExpressionStr.at(i) == '/' && iFlag == 0)
+            iPos = i;
+    }
+
     if (iPos > 0) {
         strDenLeft = itemListDen->mExpressionStr.substr(1, iPos);
         strDenRight = itemListDen->mExpressionStr.substr(iPos+1);
@@ -491,12 +521,24 @@ int ItemList::process(std::string src,ItemList *den, ItemList *mole)
         strDenLeft = itemListDen->mExpressionStr;
     }
 
-    qDebug() << "strMoleLeftstrMoleLeftstrMoleLeftstrMoleLeft = " ;
-    qDebug() << "strDenLeftstrDenLeftstrDenLeftstrDenLeftstrDenLeft = " ;
-
     std::string strMoleLeft;
     std::string strMoleRight;
-    iPos = itemListMole->mExpressionStr.find("/");
+    iPos = -1;
+    iFlag = 0;
+    qDebug() << "itemListMole->mExpressionStr = " << itemListMole->mExpressionStr.c_str();
+    for (size_t i = 0; i < itemListMole->mExpressionStr.size(); i++) {
+        if (itemListMole->mExpressionStr.at(i) == '(')
+            iFlag++;
+
+        if (itemListMole->mExpressionStr.at(i) == ')')
+            iFlag--;
+
+        if (itemListMole->mExpressionStr.at(i) == '/' && iFlag == 0)
+            iPos = i;
+    }
+
+
+    qDebug() << "iPos = " << iPos;
     if (iPos > 0) {
         strMoleLeft = itemListMole->mExpressionStr.substr(1, iPos-1);
         strMoleRight = itemListMole->mExpressionStr.substr(iPos+1);
@@ -504,9 +546,6 @@ int ItemList::process(std::string src,ItemList *den, ItemList *mole)
     else {
         strMoleLeft = itemListMole->mExpressionStr;
     }
-
-    qDebug() << "strMoleLeftstrMoleLeftstrMoleLeftstrMoleLeft = " ;
-    qDebug() << "strDenLeftstrDenLeftstrDenLeftstrDenLeftstrDenLeft = " ;
 
 
     if (!strDenRight.empty())
@@ -562,14 +601,14 @@ void ItemList::separate(ItemList *den, ItemList *mole)
         return;
 
 
-    qDebug() << "separate den start= " << den->mExpressionStr.c_str();
-    qDebug() << "separate mole  start= " << mole->mExpressionStr.c_str();
+    //qDebug() << "separate den start= " << den->mExpressionStr.c_str();
+    //qDebug() << "separate mole  start= " << mole->mExpressionStr.c_str();
 
     den->separateAllItemExponent();
     mole->separateAllItemExponent();
 
-    qDebug() << "separate den end= " << den->mExpressionStr.c_str();
-    qDebug() << "separate mole end= " << mole->mExpressionStr.c_str();
+    //qDebug() << "separate den end= " << den->mExpressionStr.c_str();
+    //qDebug() << "separate mole end= " << mole->mExpressionStr.c_str();
 
     ItemList itemListDen_den;
     ItemList itemListDen_mole;
@@ -580,17 +619,17 @@ void ItemList::separate(ItemList *den, ItemList *mole)
     ItemList::process(mole->mExpressionStr, &itemListMole_den, &itemListMole_mole);
 
 
-    qDebug() << "itemListDen_den = " << itemListDen_den.mExpressionStr.c_str();
-    qDebug() << "itemListDen_mole = " << itemListDen_mole.mExpressionStr.c_str();
+    //qDebug() << "itemListDen_den = " << itemListDen_den.mExpressionStr.c_str();
+    //qDebug() << "itemListDen_mole = " << itemListDen_mole.mExpressionStr.c_str();
 
-    qDebug() << "itemListMole_den = " << itemListMole_den.mExpressionStr.c_str();
-    qDebug() << "itemListMole_mole = " << itemListMole_mole.mExpressionStr.c_str();
+    //qDebug() << "itemListMole_den = " << itemListMole_den.mExpressionStr.c_str();
+    //qDebug() << "itemListMole_mole = " << itemListMole_mole.mExpressionStr.c_str();
 
     std::string resultMole = "(" + itemListDen_den.mExpressionStr.substr(1) + ")" + "*" + "(" + itemListMole_mole.mExpressionStr.substr(1) + ")";
     std::string resultDen = "(" + itemListDen_mole.mExpressionStr.substr(1) + ")" + "*" + "(" + itemListMole_den.mExpressionStr.substr(1) + ")";
 
-    qDebug() << "resultMole = " << resultMole.c_str();
-    qDebug() << "resultDen = " << resultDen.c_str();
+    //qDebug() << "resultMole = " << resultMole.c_str();
+    //qDebug() << "resultDen = " << resultDen.c_str();
 
     ItemList itemListResultMole_den;
     ItemList itemListResultMole_mole;
