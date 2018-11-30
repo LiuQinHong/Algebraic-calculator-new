@@ -389,8 +389,8 @@ void Item::digitalMerge(void)
     std::string tmpStr;
     std::string numStr;
     std::stringstream numStream;
-    int iSum = 1;
-    int iNum = 1;
+    double iSum = 1;
+    double iNum = 1;
 
 
 
