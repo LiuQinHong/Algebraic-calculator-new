@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     w.show();
 
 
-    ItemList itemList("2*exp+exp^2");
+    ItemList itemList("1+1");
     itemList.printAllItem();
 
     Merge merge(&itemList);

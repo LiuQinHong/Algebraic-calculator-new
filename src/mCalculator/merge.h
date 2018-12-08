@@ -17,7 +17,7 @@ class Merge{
  private:
    ItemList* mgeitemList;
    bool coefFlag;
-   std::string coefStr;
+   std::string coefStr; //系数包括pi，exp
 
  public:
 
@@ -37,7 +37,7 @@ class Merge{
 
     double calculateCoef(Item &origItem,Item &nextItem);
 
-    double extractItemcoeff(Item& origItem,Item& nextItem);
+    void extractItemcoeff(Item& origItem,Item& nextItem);
 
     double extractItemcoef(Item& origItem,Item& nextItem);
 
