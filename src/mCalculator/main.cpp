@@ -13,11 +13,10 @@ int main(int argc, char *argv[])
     w.show();
 
 
-    ItemList itemList("1+1");
+    /*ItemList itemList("1+1");
     itemList.printAllItem();
 
     Merge merge(&itemList);
-    merge.mergeItem();
-
+    merge.mergeItem();*/
     return a.exec();
 }

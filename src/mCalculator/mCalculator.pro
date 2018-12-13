@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     itemlist.cpp \
     merge.cpp \
     separation.cpp \
-    transform.cpp
+    transform.cpp \
+    tcpsever.cpp
 
 HEADERS  += mcalculator.h \
     cell.h \
@@ -38,7 +39,8 @@ HEADERS  += mcalculator.h \
     itemlist.h \
     merge.h \
     separation.h \
-    transform.h
+    transform.h \
+    tcpsever.h
 
 FORMS    += mcalculator.ui
 
