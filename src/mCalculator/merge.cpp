@@ -73,8 +73,8 @@ int Merge::mergeItem()
             coefItemList.updateFromAllItem();
 
             qDebug() << "coefItemList.mExpressionStr = " << coefItemList.mExpressionStr.c_str();
-            if(coefItemList.mExpressionStr.empty())
-                coefItemList.mExpressionStr = "+0";
+            //if(coefItemList.mExpressionStr.empty())
+            //    coefItemList.mExpressionStr = "+0";
             std::string coefItemTemp = coefItemList.mExpressionStr;
             int addFlag = coefItemTemp.find("+",1);
             int delFlag = coefItemTemp.find("-",1);
@@ -358,14 +358,16 @@ double Merge::calculateCoef(Item &origItem,Item &nextItem)
 *********************************************/
 void Merge::makeItem(ItemList *itemList)
 {
-    for(std::list<Item*>::iterator itemList_iter = itemList->mItemList.begin();
-        itemList_iter!= itemList->mItemList.end(); ++itemList_iter){
+    if(itemList->mItemList.size() > 1){
+        for(std::list<Item*>::iterator itemList_iter = itemList->mItemList.begin();
+            itemList_iter!= itemList->mItemList.end(); ++itemList_iter){
 
-        if((*itemList_iter)->mStrItem.at(1) == '0'){
-            itemList->mItemList.erase(itemList_iter++);
+            if((*itemList_iter)->mStrItem.at(1) == '0'){
+                itemList->mItemList.erase(itemList_iter++);
+            }
+            if(itemList_iter!= itemList->mItemList.end())
+                eraseItemOne((*(*itemList_iter)));
         }
-        if(itemList_iter!= itemList->mItemList.end())
-            eraseItemOne((*(*itemList_iter)));
     }
 }
 
