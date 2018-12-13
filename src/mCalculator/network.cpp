@@ -13,7 +13,7 @@ void Network::initNetwork()
 {
     if(socket == NULL){
         socket = new QTcpSocket;
-        socket->connectToHost("127.0.0.1",10010);
+        socket->connectToHost("192.168.99.16",10010);
         connect(socket,SIGNAL(readyRead()),this,SLOT(readyReadSlot()));
     }
 

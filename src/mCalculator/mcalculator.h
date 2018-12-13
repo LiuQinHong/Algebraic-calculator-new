@@ -33,6 +33,8 @@ private slots:
 
     void on_pushButton_del_clicked();
 
+    void receiveDataSlot(QByteArray data);
+
 private:
     Ui::mCalculator *ui;
     QImage      image;

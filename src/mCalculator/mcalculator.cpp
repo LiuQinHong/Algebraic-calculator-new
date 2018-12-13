@@ -6,6 +6,7 @@
 #include <qdebug.h>
 #include <iostream>
 #include <separation.h>
+#include <network.h>
 
 mCalculator::mCalculator(QWidget *parent) :
     QWidget(parent),
@@ -19,6 +20,9 @@ mCalculator::mCalculator(QWidget *parent) :
     }
 
     ui->label_name->setAlignment(Qt::AlignHCenter);
+    QObject::connect(Network::getNet(),SIGNAL(sendNetData(QByteArray)),this,SLOT(receiveDataSlot(QByteArray)));
+    Network::getNet()->initNetwork();
+    Network::getNet()->sendData("aaa");
 }
 
 mCalculator::~mCalculator()
@@ -92,4 +96,9 @@ void mCalculator::on_pushButton_del_clicked()
      cursor.deletePreviousChar();
      ui->textEdit_input->setTextCursor(cursor);
      ui->textEdit_input->show();
+}
+
+void mCalculator::receiveDataSlot(QByteArray data)
+{
+    Network::getNet()->sendData("bbb");
 }
