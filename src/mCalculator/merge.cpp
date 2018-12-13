@@ -72,6 +72,9 @@ int Merge::mergeItem()
             makeItem(&coefItemList);
             coefItemList.updateFromAllItem();
 
+            qDebug() << "coefItemList.mExpressionStr = " << coefItemList.mExpressionStr.c_str();
+            if(coefItemList.mExpressionStr.empty())
+                coefItemList.mExpressionStr = "+0";
             std::string coefItemTemp = coefItemList.mExpressionStr;
             int addFlag = coefItemTemp.find("+",1);
             int delFlag = coefItemTemp.find("-",1);
@@ -96,6 +99,8 @@ int Merge::mergeItem()
             (*itemlist_iter)->delAllCell();
 
             (*itemlist_iter)->parseItemToCell((*itemlist_iter)->mStrItem);
+
+            qDebug() << "after (*itemlist_iter)->mStrItem = " << (*itemlist_iter)->mStrItem.c_str();
 
         }
         coefStr.clear();
