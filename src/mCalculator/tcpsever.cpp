@@ -1,5 +1,6 @@
 #include "tcpsever.h"
-
+#include <qDebug>
+#include <qthreadnet.h>
 TcpSever::TcpSever(QObject *parent) : QObject(parent)
 {
 
@@ -243,11 +244,14 @@ void TcpSever::receiveDataSlot(QByteArray data)
 void TcpSever::newconnectSlot()
 {
     //重新分配套接字
+    qDebug() << "newconnectSlot";
     socket = server->nextPendingConnection();
     //套接字插入list
     //clientList->append(socket);
     //read数据绑定
-    connect(socket,SIGNAL(readyRead()),this,SLOT(readyReadSlot()));
+    QThreadNet *threadNet = new QThreadNet(socket);
+    threadNet->run();
+    //connect(socket,SIGNAL(readyRead()),this,SLOT(readyReadSlot()));
     //显示在线数
     //ui->num_label->setText(QString::number(clientList->size()));
     //掉线信号
@@ -258,12 +262,17 @@ void TcpSever::readyReadSlot()
 {
     QTcpSocket *socket = (QTcpSocket *)sender();
     QByteArray readData;
-    while(socket->bytesAvailable()>0)
+    qDebug() << "readyReadSlot";
+
+    while(socket->bytesAvailable() > 0)
     {
         readData.resize(socket->bytesAvailable());
 
         socket->read(readData.data(),readData.size());
     }
 
-    translate(socket,readData);
+    //translate(socket,readData);
+    QString strTmp = readData.data();
+    qDebug() << "server strTmp = " << strTmp;
+
 }

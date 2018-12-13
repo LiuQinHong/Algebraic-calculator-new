@@ -36,7 +36,8 @@ SOURCES += main.cpp\
     protocol.cpp \
     cal_server.cpp \
     mainwindow.cpp \
-    cal_client.cpp
+    cal_client.cpp \
+    qthreadnet.cpp
 
 HEADERS  += mcalculator.h \
     cell.h \
@@ -50,7 +51,8 @@ HEADERS  += mcalculator.h \
     protocol.h \
     cal_server.h \
     mainwindow.h \
-    cal_client.h
+    cal_client.h \
+    qthreadnet.h
 
 FORMS    += mcalculator.ui \
     cal_server.ui \
