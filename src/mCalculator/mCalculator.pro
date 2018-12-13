@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -31,7 +31,9 @@ SOURCES += main.cpp\
     merge.cpp \
     separation.cpp \
     transform.cpp \
-    tcpsever.cpp
+    tcpsever.cpp \
+    network.cpp \
+    protocol.cpp
 
 HEADERS  += mcalculator.h \
     cell.h \
@@ -40,7 +42,9 @@ HEADERS  += mcalculator.h \
     merge.h \
     separation.h \
     transform.h \
-    tcpsever.h
+    tcpsever.h \
+    network.h \
+    protocol.h
 
 FORMS    += mcalculator.ui
 
