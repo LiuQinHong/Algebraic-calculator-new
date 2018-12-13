@@ -33,7 +33,10 @@ SOURCES += main.cpp\
     transform.cpp \
     tcpsever.cpp \
     network.cpp \
-    protocol.cpp
+    protocol.cpp \
+    cal_server.cpp \
+    mainwindow.cpp \
+    cal_client.cpp
 
 HEADERS  += mcalculator.h \
     cell.h \
@@ -44,9 +47,15 @@ HEADERS  += mcalculator.h \
     transform.h \
     tcpsever.h \
     network.h \
-    protocol.h
+    protocol.h \
+    cal_server.h \
+    mainwindow.h \
+    cal_client.h
 
-FORMS    += mcalculator.ui
+FORMS    += mcalculator.ui \
+    cal_server.ui \
+    mainwindow.ui \
+    cal_client.ui
 
 RESOURCES += \
     images.qrc
