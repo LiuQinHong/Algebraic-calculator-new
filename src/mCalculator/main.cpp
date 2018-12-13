@@ -6,6 +6,9 @@
 #include <iostream>
 #include <separation.h>
 #include <mainwindow.h>
+#include <tcpsever.h>
+#include <network.h>
+
 
 int main(int argc, char *argv[])
 {
@@ -13,6 +16,15 @@ int main(int argc, char *argv[])
 
     MainWindow w;
     w.show();
+
+    TcpSever tcpServer;
+    tcpServer.initSever();
+
+    Network *net = Network::getNet();
+    net->initNetwork();
+    QByteArray writeData = Protocol::packData("login","exp","(a+b)^2/(a+c)");
+
+    net->sendData(writeData);
 
     //mCalculator w;
     //w.show();

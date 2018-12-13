@@ -16,6 +16,8 @@ public slots:
 public:
     QThreadNet(QTcpSocket *socket);
     ~QThreadNet();
+
+    void translate(QByteArray data);
     void run();
 private:
     QTcpSocket *mSocket;
